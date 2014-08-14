@@ -1,0 +1,6 @@
+"Metamod Plugin"
+{
+	"alias"		"SBGuardian"
+	"file"		"addons/sbguardian/sbguardian_i386-ep2v.so"
+}
+ 

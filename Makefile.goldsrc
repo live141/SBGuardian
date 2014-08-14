@@ -1,0 +1,75 @@
+HLSDK = /home/fabian/plugin/sourcemod/metamod/hlsdk-2.3-p3
+MM = /home/fabian/plugin/sourcemod/metamod/metamod
+
+OPT_FLAGS = -O2 -funroll-loops -pipe
+GCC4_FLAGS = -fvisibility=hidden -fvisibility-inlines-hidden -fno-strict-aliasing -fno-stack-protector -msse2 -m32
+#CC = gcc-4.1
+CC = gcc
+BINDIR_MM = hl1_mm
+BINDIR_STANDALONE = hl1_standalone
+BINDIR = $(BINDIR_MM)
+BINARY = sbguardian_i386.so
+
+OBJECTS = \
+	HL1/CRayTrace.cpp \
+	HL1/Engine.cpp \
+	HL1/hl1.cpp \
+	HL1/Player.cpp \
+	HL1/PlayerManager.cpp \
+	HL1/ServerPlugin.cpp
+
+ifeq "$(STANDALONE)" "true"
+	OBJECTS += HL1/linkent.cpp
+	BINDIR = $(BINDIR_STANDALONE)
+endif
+
+OBJECTS += \
+	CommandCallback.cpp \
+	CStr.cpp \
+	CVector.cpp \
+	DLL.cpp \
+	externs.cpp \
+	File.cpp \
+	SBGuardian.cpp \
+	Socket.cpp \
+	Thread.cpp \
+	Time.cpp \
+	Vector.cpp \
+	modules/AntiAimbot/AntiAimbot.cpp \
+	modules/AntiFlashhack/AntiFlashhack.cpp \
+	modules/AntiWallhack/AntiWallhack.cpp \
+	modules/CvarCheck/CvarCheck.cpp \
+	modules/FOVCheck/FOVCheck.cpp \
+	modules/UpdateSystem/UpdateSystem.cpp
+
+GCC_VERSION := $(shell $(CC) -dumpversion >&1 | cut -b1)
+CFLAGS += -D_LINUX -DNDEBUG -D_snprintf=snprintf -D_vsnprintf=vsnprintf \
+        -Wall -Wno-unknown-pragmas -Wno-non-virtual-dtor -fPIC -fno-exceptions -fno-rtti -static-libgcc
+ifeq "$(GCC_VERSION)" "4"
+        CFLAGS += $(GCC4_FLAGS)
+endif
+
+INCLUDE = \
+	-I. \
+	-I$(HLSDK) \
+	-I$(HLSDK)/multiplayer/engine \
+	-I$(HLSDK)/multiplayer/dlls \
+	-I$(HLSDK)/multiplayer/common \
+	-I$(MM)
+
+LINK = /usr/lib/gcc/i486-linux-gnu/4.1/libstdc++.a -m32 -lm -ldl -fPIC -fno-exceptions -fno-rtti -static-libgcc -Wno-non-virtual-dtor -shared
+
+####################################################################################################### 
+OBJ_LINUX := $(OBJECTS:%.cpp=$(BINDIR)/%.o)
+
+$(BINDIR)/%.o: %.cpp
+	$(CC) $(INCLUDE) $(CFLAGS) -o $@ -c $<
+#######################################################################################################
+default: $(OBJ_LINUX)
+	@mkdir -p $(BINDIR_MM)/HL1 2> /dev/null
+	@mkdir -p $(BINDIR_STANDALONE)/HL1 2> /dev/null
+	$(CC) $(INCLUDE) $(OBJ_LINUX) $(LINK) -o $(BINDIR)/$(BINARY)
+clean:
+	rm -f $(BINDIR_MM)/*.o $(BINDIR_MM)/$(BINARY) $(BINDIR_STANDALONE)/*.o $(BINDIR_STANDALONE)/$(BINARY)
+
+.PHONY: clean default

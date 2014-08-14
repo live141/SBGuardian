@@ -1,0 +1,6 @@
+"Metamod Plugin"
+{
+	"alias"		"SBGuardian"
+	"file"		"addons/sbguardian/sbguardian-ep2v.dll"
+}
+ 
