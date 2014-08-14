@@ -15,6 +15,16 @@
 *
 * You should have received a copy of the GNU General Public License
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
+*
+* In addition, as a special exception, the author gives permission to
+* link the code of this program with the Half-Life Game Engine ("HL
+* Engine") and Modified Game Libraries ("MODs") developed by Valve,
+* L.L.C ("Valve").  You must obey the GNU General Public License in all
+* respects for all of the code used other than the HL Engine and MODs
+* from Valve.  If you modify this file, you may extend this exception
+* to your version of the file, but you are not obligated to do so.  If
+* you do not wish to do so, delete this exception statement from your
+* version.
 **/
 
 #include "linkent.h"
