@@ -62,8 +62,8 @@ SH_DECL_HOOK5_void(IServerPluginCallbacks, OnQueryCvarValueFinished, SH_NOATTRIB
 SH_DECL_HOOK3_void(CBasePlayer, TraceAttack, SH_NOATTRIB, 0, const CTakeDamageInfo &, const Vector&, trace_t *);
 SH_DECL_HOOK2(IVEngineServer, UserMessageBegin, SH_NOATTRIB, 0, bf_write *, IRecipientFilter *, int);
 SH_DECL_HOOK0_void(IVEngineServer, MessageEnd, SH_NOATTRIB, 0);
-SH_DECL_HOOK14_void(IEngineSound, EmitSound, SH_NOATTRIB, 0, IRecipientFilter &, int, int, const char *, float, float, int, int, const Vector *, const Vector *, CUtlVector<Vector> *, bool, float, int);
-SH_DECL_HOOK14_void(IEngineSound, EmitSound, SH_NOATTRIB, 1, IRecipientFilter &, int, int, const char *, float, soundlevel_t, int, int, const Vector *, const Vector *, CUtlVector<Vector> *, bool, float, int);
+SH_DECL_HOOK15_void(IEngineSound, EmitSound, SH_NOATTRIB, 0, IRecipientFilter&, int, int, const char *, float, soundlevel_t, int, int, int, const Vector*, const Vector*, CUtlVector< Vector >*, bool, float, int);
+//SH_DECL_HOOK15_void(IEngineSound, EmitSound, SH_NOATTRIB, 1, IRecipientFilter&, int, int, const char *, float, soundlevel_t, int, int, int, const Vector*, const Vector*, CUtlVector< Vector >*, bool, float, int);
 /********************************************************************************************************/
 
 int CServerPlugin::findInSendTable(const char *ClassName, const char* PropName) {
@@ -209,7 +209,7 @@ void CServerPlugin::loadHooks() {
 	// SH_ADD_HOOK(IGameMovement, ProcessMovement, g_pGameMovement, &CServerPlugin::onProcessMove, false);
 	SH_ADD_HOOK(IVEngineServer, UserMessageBegin, g_pEngine, &CServerPlugin::onUserMessageBegin, false);
 	SH_ADD_HOOK(IVEngineServer, MessageEnd, g_pEngine, &CServerPlugin::onMessageEnd, false);
-	SH_ADD_HOOK(IEngineSound, EmitSound, g_pEngineSound, &CServerPlugin::onEmitSound, false);
+	//SH_ADD_HOOK(IEngineSound, EmitSound, g_pEngineSound, &CServerPlugin::onEmitSound, false);
 	SH_ADD_HOOK(IEngineSound, EmitSound, g_pEngineSound, &CServerPlugin::onEmitSound2, false);
 	loadHooksVSP();
 }
@@ -231,7 +231,7 @@ void CServerPlugin::unloadHooks() {
 	// SH_REMOVE_HOOK(IGameMovement, ProcessMovement, g_pGameMovement, &CServerPlugin::onProcessMove, false);
 	SH_REMOVE_HOOK(IVEngineServer, UserMessageBegin, g_pEngine, &CServerPlugin::onUserMessageBegin, false);
 	SH_REMOVE_HOOK(IVEngineServer, MessageEnd, g_pEngine, &CServerPlugin::onMessageEnd, false);
-	SH_REMOVE_HOOK(IEngineSound, EmitSound, g_pEngineSound, &CServerPlugin::onEmitSound, false);
+	//SH_REMOVE_HOOK(IEngineSound, EmitSound, g_pEngineSound, &CServerPlugin::onEmitSound, false);
 	SH_REMOVE_HOOK(IEngineSound, EmitSound, g_pEngineSound, &CServerPlugin::onEmitSound2, false);
 }
 
@@ -535,10 +535,13 @@ void CServerPlugin::onMessageEnd( void ) {
 	RETURN_META(MRES_IGNORED);
 }
 
-
-void CServerPlugin::onEmitSound2( IRecipientFilter& filter, int iEntIndex, int iChannel, const char *pSample, 
-		float flVolume, float flAttenuation, int iFlags, int iPitch, 
-		const Vector *pOrigin, const Vector *pDirection, CUtlVector< Vector >* pUtlVecOrigins, bool bUpdatePositions, float soundtime, int speakerentity ) {
+//void CServerPlugin::onEmitSound2( IRecipientFilter& filter, int iEntIndex, int iChannel, const char *pSample, 
+//		float flVolume, float flAttenuation, int iFlags, int iPitch, 
+//		const Vector *pOrigin, const Vector *pDirection, CUtlVector< Vector >* pUtlVecOrigins, bool bUpdatePositions, float soundtime, int speakerentity ) {
+void CServerPlugin::onEmitSound2(IRecipientFilter& filter, int iEntIndex, int iChannel, const char *pSample,
+                float flVolume, soundlevel_t iSoundlevel, int iFlags, int iPitch,  int iSpecialDSP,
+                const Vector *pOrigin, const Vector *pDirection, CUtlVector< Vector >* pUtlVecOrigins, bool bUpdatePositions, float soundtime, int speakerentity )
+{
 	// send sound from players which are not transmitted
 	CRecipientFilter &Filter = (CRecipientFilter&) filter;
 	vector<IPlayer *> vecRecipients;
@@ -553,7 +556,7 @@ void CServerPlugin::onEmitSound2( IRecipientFilter& filter, int iEntIndex, int i
 	CVector vecOrigin;
 	if( pOrigin != NULL )
 		vecOrigin.set(pOrigin->x, pOrigin->y, pOrigin->z);
-	g_SBG.onEmitSound(vecRecipients, iEntIndex, iChannel, flVolume, flAttenuation, &vecOrigin);
+	g_SBG.onEmitSound(vecRecipients, iEntIndex, iChannel, flVolume, (float) iSoundlevel, &vecOrigin);
 	vector<IPlayer *>::iterator it = vecRecipients.begin();
 	for( ; it < vecRecipients.end(); it++ ) {
 		Filter.AddRecipient((CBasePlayer *) ((edict_t *) ((CPlayer *) *it)->getEdict())->GetUnknown()->GetBaseEntity());
@@ -562,9 +565,10 @@ void CServerPlugin::onEmitSound2( IRecipientFilter& filter, int iEntIndex, int i
 	RETURN_META(MRES_IGNORED);
 }
 
-void CServerPlugin::onEmitSound( IRecipientFilter& filter, int iEntIndex, int iChannel, const char *pSample, 
-		float flVolume, soundlevel_t iSoundlevel, int iFlags, int iPitch, 
-		const Vector *pOrigin, const Vector *pDirection, CUtlVector< Vector >* pUtlVecOrigins, bool bUpdatePositions, float soundtime, int speakerentity ) {
+void CServerPlugin::onEmitSound(IRecipientFilter& filter, int iEntIndex, int iChannel, const char *pSample,
+                float flVolume, soundlevel_t iSoundlevel, int iFlags, int iPitch,  int iSpecialDSP,
+                const Vector *pOrigin, const Vector *pDirection, CUtlVector< Vector >* pUtlVecOrigins, bool bUpdatePositions, float soundtime, int speakerentity )
+{
 	// send sound from players which are not transmitted
 	CRecipientFilter &Filter = (CRecipientFilter&) filter;
 	vector<IPlayer *> vecRecipients;

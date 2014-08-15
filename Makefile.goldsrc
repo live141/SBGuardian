@@ -1,5 +1,5 @@
-HLSDK = /home/fabian/sdks/hlsdk/multiplayer
-MM = /home/fabian/sdks/metamod-p-1.19p32/metamod
+HLSDK = /home/fabian/sdks_new/hl1sdk
+MM = /home/fabian/sdks_new/mm/metamod
 
 OPT_FLAGS = -O2 -funroll-loops -pipe
 GCC4_FLAGS = -fvisibility=hidden -fvisibility-inlines-hidden -fno-strict-aliasing -fno-stack-protector -msse2 -m32
@@ -55,6 +55,7 @@ INCLUDE = \
 	-I$(HLSDK)/engine \
 	-I$(HLSDK)/dlls \
 	-I$(HLSDK)/common \
+	-I$(HLSDK)/public \
 	-I$(MM)
 
 LINK = $(shell $(CC) -print-file-name=libstdc++.a) -m32 -lm -ldl -fPIC -fno-exceptions -fno-rtti -static-libgcc -Wno-non-virtual-dtor -shared

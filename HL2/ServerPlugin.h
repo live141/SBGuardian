@@ -130,13 +130,13 @@ public:
     static void onTraceAttack(const CTakeDamageInfo& info, const Vector& vecDir, trace_t *pTr);
 	static bf_write *onUserMessageBegin( IRecipientFilter *filter, int msg_type );
 	static void onMessageEnd( void );
-	static void onEmitSound2( IRecipientFilter& filter, int iEntIndex, int iChannel, const char *pSample, 
-		float flVolume, float flAttenuation, int iFlags = 0, int iPitch = PITCH_NORM, 
-		const Vector *pOrigin = NULL, const Vector *pDirection = NULL, CUtlVector< Vector >* pUtlVecOrigins = NULL, bool bUpdatePositions = true, float soundtime = 0.0f, int speakerentity = -1 );
+	static void onEmitSound2( IRecipientFilter& filter, int iEntIndex, int iChannel, const char *pSample,
+                float flVolume, soundlevel_t iSoundlevel, int iFlags = 0, int iPitch = PITCH_NORM,  int iSpecialDSP = 0,
+                const Vector *pOrigin = NULL, const Vector *pDirection = NULL, CUtlVector< Vector >* pUtlVecOrigins = NULL, bool bUpdatePositions = true, float soundtime = 0.0f, int speakerentity = -1  );
 
-	static void onEmitSound( IRecipientFilter& filter, int iEntIndex, int iChannel, const char *pSample, 
-		float flVolume, soundlevel_t iSoundlevel, int iFlags = 0, int iPitch = PITCH_NORM, 
-		const Vector *pOrigin = NULL, const Vector *pDirection = NULL, CUtlVector< Vector >* pUtlVecOrigins = NULL, bool bUpdatePositions = true, float soundtime = 0.0f, int speakerentity = -1 );
+	static void onEmitSound( IRecipientFilter& filter, int iEntIndex, int iChannel, const char *pSample,
+                float flVolume, soundlevel_t iSoundlevel, int iFlags = 0, int iPitch = PITCH_NORM,  int iSpecialDSP = 0,
+                const Vector *pOrigin = NULL, const Vector *pDirection = NULL, CUtlVector< Vector >* pUtlVecOrigins = NULL, bool bUpdatePositions = true, float soundtime = 0.0f, int speakerentity = -1  );
 
 };
 

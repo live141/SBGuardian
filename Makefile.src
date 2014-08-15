@@ -1,0 +1,138 @@
+HL2SDK_ORIG = /home/fabian/sdks_new/hl2sdk
+HL2SDK_OB = /home/fabian/sdks_new/hl2sdk_orangebox
+HL2SDK_CSS = /home/fabian/sdks_new/hl2sdk_css
+HL2SDK_OB_VALVE = /home/fabian/sdks_new/hl2sdk_orangeboxvalve
+HL2SDK_L4D = /home/fabian/sdks_new/hl2sdk_l4d
+HL2SDK_L4D2 = /home/fabian/sdks_new/hl2sdk_l4d2
+HL2SDK_CSGO = /home/fabian/sdks_new/hl2sdk_csgo
+MMSOURCE = /home/fabian/sdks_new/mm_source/core
+
+OPT_FLAGS = -O2 -funroll-loops -pipe
+GCC4_FLAGS = -fvisibility=hidden -fvisibility-inlines-hidden -fno-strict-aliasing -fno-stack-protector -msse2 -m32
+#CC = gcc-4.1
+CC = gcc
+EXT = 
+BINNAME = sbguardian
+
+OBJECTS = \
+	HL2/CRayTrace.cpp \
+	HL2/Engine.cpp \
+	HL2/Player.cpp \
+	HL2/PlayerManager.cpp \
+	HL2/ServerPlugin.cpp \
+	HL2/unresolved_symbols.cpp \
+	HL2/VSPCallback.cpp
+
+OBJECTS += \
+	CommandCallback.cpp \
+	CStr.cpp \
+	CVector.cpp \
+	DLL.cpp \
+	externs.cpp \
+	File.cpp \
+	SBGuardian.cpp \
+	Socket.cpp \
+	Thread.cpp \
+	Time.cpp \
+	Vector.cpp \
+	modules/AntiAimbot/AntiAimbot.cpp \
+	modules/AntiFlashhack/AntiFlashhack.cpp \
+	modules/AntiWallhack/AntiWallhack.cpp \
+	modules/CvarCheck/CvarCheck.cpp \
+	modules/FOVCheck/FOVCheck.cpp \
+	modules/UpdateSystem/UpdateSystem.cpp
+
+LINK = $(shell $(CC) -print-file-name=libstdc++.a) -m32 -lm -ldl -fPIC -fno-exceptions -fno-rtti -static-libgcc -Wno-non-virtual-dtor -shared \
+	$(HL2LIB)/tier1_i486.a $(LIB_PREFIX)vstdlib$(LIB_SUFFIX) $(LIB_PREFIX)tier0$(LIB_SUFFIX)
+
+ifeq "$(ENGINE)" "original"
+	HL2SDK = $(HL2SDK_ORIG)
+	CFLAGS += -DSOURCE_ENGINE=1
+	EXT = original
+	HL2LIB = $(HL2SDK)/linux_sdk
+endif
+ifeq "$(ENGINE)" "orangebox"
+	HL2SDK = $(HL2SDK_OB)
+	CFLAGS += -DSOURCE_ENGINE=3
+	EXT = orangebox
+	HL2LIB = $(HL2SDK)/lib/linux
+endif
+ifeq "$(ENGINE)" "css"
+	HL2SDK = $(HL2SDK_CSS)
+	CFLAGS += -DSOURCE_ENGINE=6
+	EXT = css
+	HL2LIB = $(HL2SDK)/lib/linux
+endif
+ifeq "$(ENGINE)" "orangeboxvalve"
+	HL2SDK = $(HL2SDK_OB_VALVE)
+	CFLAGS += -DSOURCE_ENGINE=7
+	EXT = orangeboxvalve
+	HL2LIB = $(HL2SDK)/lib/linux
+endif
+ifeq "$(ENGINE)" "left4dead"
+	HL2SDK = $(HL2SDK_L4D)
+	CFLAGS += -DSOURCE_ENGINE=8
+	EXT = l4d
+	HL2LIB = $(HL2SDK)/lib/linux
+endif
+ifeq "$(ENGINE)" "left4dead2"
+	HL2SDK = $(HL2SDK_L4D2)
+	CFLAGS += -DSOURCE_ENGINE=9
+	EXT = l4d2
+	HL2LIB = $(HL2SDK)/lib/linux
+endif
+ifeq "$(ENGINE)" "csgo"
+	HL2SDK = $(HL2SDK_CSGO)
+	CFLAGS += -DSOURCE_ENGINE=12
+	EXT = csgo
+	HL2LIB = $(HL2SDK)/lib/linux
+	LINK += $(HL2LIB)/interfaces_i486.a
+endif
+
+BINDIR_MM = hl2_mm_$(EXT)
+BINDIR_STANDALONE = hl2_standalone_$(EXT)
+BINDIR = $(BINDIR_MM)
+BINARY = $(BINNAME)_$(EXT).so
+
+HL2PUB = $(HL2SDK)/public
+
+GCC_VERSION := $(shell $(CC) -dumpversion >&1 | cut -b1)
+CFLAGS += -DPOSIX -Dstricmp=strcasecmp -D_stricmp=strcasecmp -D_strnicmp=strncasecmp \
+	-Dstrnicmp=strncasecmp -D_alloca=alloca \
+	-Dstrcmpi=strcasecmp -DCOMPILER_GCC -D_LINUX -DNDEBUG -D_snprintf=snprintf -D_vsnprintf=vsnprintf \
+        -Wall -Wno-unknown-pragmas -Wno-non-virtual-dtor -fPIC -fno-exceptions -fno-rtti -static-libgcc
+CFLAGS += -DSE_EPISODEONE=1 -DSE_DARKMESSIAH=2 -DSE_ORANGEBOX=3 -DSE_BLOODYGOODTIME=4 -DSE_EYE=5 \
+	-DSE_CSS=6 -DSE_ORANGEBOXVALVE=7 -DSE_LEFT4DEAD=8 -DSE_LEFT4DEAD2=9 -DSE_ALIENSWARM=10 \
+	-DSE_PORTAL2=11 -DSE_CSGO=12
+ifeq "$(GCC_VERSION)" "4"
+        CFLAGS += $(GCC4_FLAGS)
+endif
+
+INCLUDE += -I. \
+	-I$(MMSOURCE) \
+	-I$(MMSOURCE)/sourcehook \
+	-I$(HL2PUB) \
+	-I$(HL2PUB)/engine \
+	-I$(HL2PUB)/mathlib \
+	-I$(HL2PUB)/vstdlib \
+	-I$(HL2PUB)/tier0 \
+	-I$(HL2PUB)/tier1 \
+	-I$(HL2SDK)/game/shared \
+	-I$(HL2SDK)/game/server \
+	-I$(HL2SDK)/public/game/server
+
+####################################################################################################### 
+OBJ_LINUX := $(OBJECTS:%.cpp=$(BINDIR)/%.o)
+
+$(BINDIR)/%.o: %.cpp
+	@mkdir -p $(shell dirname $@)
+	$(CC) $(INCLUDE) $(CFLAGS) -o $@ -c $<
+#######################################################################################################
+default: $(BINDIR) $(OBJ_LINUX)
+	$(CC) $(INCLUDE) $(OBJ_LINUX) $(LINK) -o $(BINDIR)/$(BINARY)
+clean:
+	@rm -f $(BINDIR)/$(BINARY) $(OBJ_LINUX)
+$(BINDIR):
+	@mkdir $(BINDIR) 2> /dev/null
+
+.PHONY: clean default
