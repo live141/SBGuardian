@@ -38,11 +38,19 @@ bool CSBGuardian::load(IPlayerManager *pPlayerManager, IEngine *pEngine) {
 	// m_pSh = new CAntiSpeedhack();
 
 	// init all modules
+	/*
 	IModule **pModule = (IModule **) &m_pWh;
 	while( *pModule != NULL ) {
 		pModule[0]->init(pEngine, pPlayerManager);
 		pModule++;
 	}
+	*/
+	m_pWh->init(pEngine, pPlayerManager);
+	m_pFlash->init(pEngine, pPlayerManager);
+	m_pFov->init(pEngine, pPlayerManager);
+	m_pCvar->init(pEngine, pPlayerManager);
+	m_pAb->init(pEngine, pPlayerManager);
+	m_pWm->init(pEngine, pPlayerManager);
 
 	m_pEngine->command("exec sbg.cfg\n");
 
