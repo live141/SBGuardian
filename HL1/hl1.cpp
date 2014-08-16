@@ -397,6 +397,7 @@ extern "C" DLLEXP int GetEngineFunctions(enginefuncs_t *pengfuncsFromEngine, int
 
 extern "C" DLLEXP int GetEntityAPI2(DLL_FUNCTIONS *pFunctionTable, int *interfaceVersion)
 {
+	printf("SBGuardian: GetEntityAPI2 called...\r\n");
 	if(!pFunctionTable) {
 		printf("GetEntityAPI2 called with null pFunctionTable\n");
 		return(FALSE);
@@ -451,7 +452,7 @@ extern "C" DLLEXP void WINAPI GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngin
 	memcpy(&g_engfuncs, pengfuncsFromEngine, sizeof(enginefuncs_t));
 	g_Globals = pGlobals;
 	gpGlobals = pGlobals;
-	
+
 #ifdef STANDALONE
 	setPtr(pengfuncsFromEngine, &EngFuncs, sizeof(enginefuncs_t));
 
@@ -459,6 +460,7 @@ extern "C" DLLEXP void WINAPI GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngin
 	char dll[512+256];
 	g_EngFuncs.pfnGetGameDir(gamedir);
 	int i;
+	printf("SBGuardian: Searching for game object...\r\n");
 	for(i = 0; i < sizeof(dllnames)/(sizeof(dllnames[1])*sizeof(char)); i++)
 	{
 		strcpy(dll, gamedir);
@@ -469,11 +471,14 @@ extern "C" DLLEXP void WINAPI GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngin
 		strcat(dll, ".dll");
 #else
 
+/* OLD!
 #ifdef __amd64__
 		strcat(dll, "_amd64.so");
 #else
 		strcat(dll, "_i386.so");
 #endif
+*/
+		strcat(dll, ".so");
 
 #endif
 
@@ -485,143 +490,149 @@ extern "C" DLLEXP void WINAPI GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngin
 		Dll.close();
 	}
 
+	if(!Dll.isOpen()) {
+		printf("SBGuardian: Could not find game object!\r\n");
+		exit(-1);
+	}
+
 	if(!(addrFuncPtrsToDll = Dll.sym("GiveFnptrsToDll")))
 	{
 		// giveFNs(addr);
 	}
 
 	if(!(addrNewDllFuncs = Dll.sym("GetNewDLLFunctions")))
+		{
+			// load_getNewDLLFunctions(addr);
+		}
+
+		if(!(addrEntityAPI2 = Dll.sym("GetEntityAPI2" )))
+		{
+			// load_GetEntityAPI2(addr);
+		}
+
+		if(!(addrEntityAPI = Dll.sym("GetEntityAPI")))
+		{
+			// load_GetEntityAPI(addr);
+		}
+
+		LoadFuncPtrsToDll(pengfuncsFromEngine);
+		LoadNewDLLFuncs(&g_NewDllFuncs);
+		// LoadEntityAPI2(&g_FunctionTable2);
+		LoadEntityAPI(&g_FunctionTable);
+		// g_CServerPlugin.Init();
+		return;
+	#endif
+
+		// g_CServerPlugin.Init();
+
+	}
+
+	#ifndef STANDALONE
+
+	#include <meta_api.h>
+
+	// Must provide at least one of these..
+	static META_FUNCTIONS gMetaFunctionTable = {
+		NULL,			// pfnGetEntityAPI				HL SDK; called before game DLL
+		NULL,			// pfnGetEntityAPI_Post			META; called after game DLL
+		GetEntityAPI2,	// pfnGetEntityAPI2				HL SDK2; called before game DLL
+		NULL, // GetEntityAPI2_Post,	// pfnGetEntityAPI2_Post		META; called after game DLL
+		GetNewDLLFunctions,			// pfnGetNewDLLFunctions	HL SDK2; called before game DLL
+		NULL,			// pfnGetNewDLLFunctions_Post	META; called after game DLL
+		GetEngineFunctions,	// pfnGetEngineFunctions	META; called before HL engine
+		NULL,			// pfnGetEngineFunctions_Post	META; called after HL engine
+	};
+
+	// Description of plugin
+	plugin_info_t Plugin_info = {
+		META_INTERFACE_VERSION,	// ifvers
+		NAME,	// name
+		VERSION,	// version
+		__DATE__,	// date
+		AUTHOR,	// author
+		URL,	// url
+		PLUGINTAG,	// logtag, all caps please
+		PT_ANYPAUSE,	// (when) loadable
+		PT_ANYPAUSE,	// (when) unloadable
+	};
+
+	// Global vars from metamod:
+	meta_globals_t *gpMetaGlobals;		// metamod globals
+	gamedll_funcs_t *gpGamedllFuncs;	// gameDLL function tables
+	mutil_funcs_t *gpMetaUtilFuncs;		// metamod utility functions
+
+	extern "C" int Meta_Attach(PLUG_LOADTIME  now,
+			META_FUNCTIONS *pFunctionTable, meta_globals_t *pMGlobals,
+			gamedll_funcs_t *pGamedllFuncs)
 	{
-		// load_getNewDLLFunctions(addr);
+		if(!pMGlobals) {
+			LOG_ERROR(PLID, "Meta_Attach called with null pMGlobals");
+			return(FALSE);
+		}
+		gpMetaGlobals=pMGlobals;
+		if(!pFunctionTable) {
+			LOG_ERROR(PLID, "Meta_Attach called with null pFunctionTable");
+			return(FALSE);
+		}
+		memcpy(pFunctionTable, &gMetaFunctionTable, sizeof(META_FUNCTIONS));
+		gpGamedllFuncs=pGamedllFuncs;
+
+		// g_CServerPlugin.Init();
+
+		/* InitLate*/
+		if(now > PT_STARTUP)
+		{
+			g_ServerPlugin.init(true);
+		}
+
+		return(TRUE);
 	}
 
-	if(!(addrEntityAPI2 = Dll.sym("GetEntityAPI2" )))
+	extern "C" int Meta_Detach(PLUG_LOADTIME /* now */,
+			PL_UNLOAD_REASON /* reason */)
 	{
-		// load_GetEntityAPI2(addr);
+		// g_SBG.unload();
+		g_ServerPlugin.unload();
+		return(TRUE);
 	}
 
-	if(!(addrEntityAPI = Dll.sym("GetEntityAPI")))
+	extern "C" int Meta_Query(const char * /*ifvers */, plugin_info_t **pPlugInfo,
+			mutil_funcs_t *pMetaUtilFuncs)
 	{
-		// load_GetEntityAPI(addr);
+		// Give metamod our plugin_info struct
+		*pPlugInfo=&Plugin_info;
+		// Get metamod utility function table.
+		gpMetaUtilFuncs=pMetaUtilFuncs;
+
+		return(TRUE);
 	}
 
-	LoadFuncPtrsToDll(pengfuncsFromEngine);
-	LoadNewDLLFuncs(&g_NewDllFuncs);
-	// LoadEntityAPI2(&g_FunctionTable2);
-	LoadEntityAPI(&g_FunctionTable);
-	// g_CServerPlugin.Init();
-	return;
-#endif
+	#endif
 
-	// g_CServerPlugin.Init();
+	#ifdef STANDALONE
 
-}
+	#define DLL_PROCESS_ATTACH 1
+	#define DLL_PROCESS_DETACH 0
 
-#ifndef STANDALONE
-
-#include <meta_api.h>
-
-// Must provide at least one of these..
-static META_FUNCTIONS gMetaFunctionTable = {
-	NULL,			// pfnGetEntityAPI				HL SDK; called before game DLL
-	NULL,			// pfnGetEntityAPI_Post			META; called after game DLL
-	GetEntityAPI2,	// pfnGetEntityAPI2				HL SDK2; called before game DLL
-	NULL, // GetEntityAPI2_Post,	// pfnGetEntityAPI2_Post		META; called after game DLL
-	GetNewDLLFunctions,			// pfnGetNewDLLFunctions	HL SDK2; called before game DLL
-	NULL,			// pfnGetNewDLLFunctions_Post	META; called after game DLL
-	GetEngineFunctions,	// pfnGetEngineFunctions	META; called before HL engine
-	NULL,			// pfnGetEngineFunctions_Post	META; called after HL engine
-};
-
-// Description of plugin
-plugin_info_t Plugin_info = {
-	META_INTERFACE_VERSION,	// ifvers
-	NAME,	// name
-	VERSION,	// version
-	__DATE__,	// date
-	AUTHOR,	// author
-	URL,	// url
-	PLUGINTAG,	// logtag, all caps please
-	PT_ANYPAUSE,	// (when) loadable
-	PT_ANYPAUSE,	// (when) unloadable
-};
-
-// Global vars from metamod:
-meta_globals_t *gpMetaGlobals;		// metamod globals
-gamedll_funcs_t *gpGamedllFuncs;	// gameDLL function tables
-mutil_funcs_t *gpMetaUtilFuncs;		// metamod utility functions
-
-extern "C" int Meta_Attach(PLUG_LOADTIME  now,
-		META_FUNCTIONS *pFunctionTable, meta_globals_t *pMGlobals,
-		gamedll_funcs_t *pGamedllFuncs)
-{
-	if(!pMGlobals) {
-		LOG_ERROR(PLID, "Meta_Attach called with null pMGlobals");
-		return(FALSE);
-	}
-	gpMetaGlobals=pMGlobals;
-	if(!pFunctionTable) {
-		LOG_ERROR(PLID, "Meta_Attach called with null pFunctionTable");
-		return(FALSE);
-	}
-	memcpy(pFunctionTable, &gMetaFunctionTable, sizeof(META_FUNCTIONS));
-	gpGamedllFuncs=pGamedllFuncs;
-
-	// g_CServerPlugin.Init();
-
-	/* InitLate*/
-	if(now > PT_STARTUP)
+	#ifdef WIN32
+	// Required DLL entry point
+	extern "C" BOOL WINAPI DllMain(
+	   HINSTANCE hinstDLL,
+	   DWORD fdwReason,
+	   LPVOID lpvReserved)
 	{
-		g_ServerPlugin.init(true);
+		if(fdwReason == DLL_PROCESS_ATTACH)
+	    {
+		printf("SBGuardian: object loaded!\n");
+	    }
+		else if(fdwReason == DLL_PROCESS_DETACH)
+	    {
+	    }
+		return TRUE;
 	}
+	#endif
 
-	return(TRUE);
-}
-
-extern "C" int Meta_Detach(PLUG_LOADTIME /* now */,
-		PL_UNLOAD_REASON /* reason */)
-{
-	// g_SBG.unload();
-	g_ServerPlugin.unload();
-	return(TRUE);
-}
-
-extern "C" int Meta_Query(char * /*ifvers */, plugin_info_t **pPlugInfo,
-		mutil_funcs_t *pMetaUtilFuncs)
-{
-	// Give metamod our plugin_info struct
-	*pPlugInfo=&Plugin_info;
-	// Get metamod utility function table.
-	gpMetaUtilFuncs=pMetaUtilFuncs;
-
-	return(TRUE);
-}
-
-#endif
-
-#ifdef STANDALONE
-
-#define DLL_PROCESS_ATTACH 1
-#define DLL_PROCESS_DETACH 0
-
-#ifdef WIN32
-// Required DLL entry point
-extern "C" BOOL WINAPI DllMain(
-   HINSTANCE hinstDLL,
-   DWORD fdwReason,
-   LPVOID lpvReserved)
-{
-	if(fdwReason == DLL_PROCESS_ATTACH)
-    {
-    }
-	else if(fdwReason == DLL_PROCESS_DETACH)
-    {
-    }
-	return TRUE;
-}
-#endif
-
-#endif
+	#endif
 
 
 
