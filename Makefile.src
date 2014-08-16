@@ -7,7 +7,7 @@ HL2SDK_L4D2 = /home/fabian/sdks_new/hl2sdk_l4d2
 HL2SDK_CSGO = /home/fabian/sdks_new/hl2sdk_csgo
 MMSOURCE = /home/fabian/sdks_new/mm_source/core
 
-OPT_FLAGS = -O2 -funroll-loops -pipe
+OPT_FLAGS = -O3 -funroll-loops -pipe
 GCC4_FLAGS = -fvisibility=hidden -fvisibility-inlines-hidden -fno-strict-aliasing -fno-stack-protector -msse2 -m32
 #CC = gcc-4.1
 CC = gcc
@@ -35,12 +35,20 @@ OBJECTS += \
 	Thread.cpp \
 	Time.cpp \
 	Vector.cpp \
+	SteamId.cpp \
 	modules/AntiAimbot/AntiAimbot.cpp \
 	modules/AntiFlashhack/AntiFlashhack.cpp \
 	modules/AntiWallhack/AntiWallhack.cpp \
 	modules/CvarCheck/CvarCheck.cpp \
 	modules/FOVCheck/FOVCheck.cpp \
-	modules/UpdateSystem/UpdateSystem.cpp
+	modules/UpdateSystem/UpdateSystem.cpp \
+	modules/Warmodus/Warmodus.cpp \
+	sourcehook.cpp \
+	sourcehook_impl_chookidman.cpp \
+	sourcehook_impl_chookmaninfo.cpp \
+	sourcehook_impl_cproto.cpp \
+	sourcehook_impl_cvfnptr.cpp
+
 
 LINK = $(shell $(CC) -print-file-name=libstdc++.a) -m32 -lm -ldl -fPIC -fno-exceptions -fno-rtti -static-libgcc -Wno-non-virtual-dtor -shared \
 	$(HL2LIB)/tier1_i486.a $(LIB_PREFIX)vstdlib$(LIB_SUFFIX) $(LIB_PREFIX)tier0$(LIB_SUFFIX)
@@ -100,7 +108,8 @@ GCC_VERSION := $(shell $(CC) -dumpversion >&1 | cut -b1)
 CFLAGS += -DPOSIX -Dstricmp=strcasecmp -D_stricmp=strcasecmp -D_strnicmp=strncasecmp \
 	-Dstrnicmp=strncasecmp -D_alloca=alloca \
 	-Dstrcmpi=strcasecmp -DCOMPILER_GCC -D_LINUX -DNDEBUG -D_snprintf=snprintf -D_vsnprintf=vsnprintf \
-        -Wall -Wno-unknown-pragmas -Wno-non-virtual-dtor -fPIC -fno-exceptions -fno-rtti -static-libgcc
+        -Wall -Wno-unknown-pragmas -Wno-non-virtual-dtor -fPIC -fno-exceptions -fno-rtti -static-libgcc \
+	$(OPT_FLAGS)
 CFLAGS += -DSE_EPISODEONE=1 -DSE_DARKMESSIAH=2 -DSE_ORANGEBOX=3 -DSE_BLOODYGOODTIME=4 -DSE_EYE=5 \
 	-DSE_CSS=6 -DSE_ORANGEBOXVALVE=7 -DSE_LEFT4DEAD=8 -DSE_LEFT4DEAD2=9 -DSE_ALIENSWARM=10 \
 	-DSE_PORTAL2=11 -DSE_CSGO=12
