@@ -53,7 +53,7 @@ private:
 
 public:
 	CSBGuardian() : m_pPlayerManager(NULL), m_pEngine(NULL), m_bLoaded(false), m_pWh(NULL),
-	m_pFlash(NULL), m_pFov(NULL), m_pCvar(NULL), m_void(NULL), m_pUpdate(NULL), m_pAb(NULL)/*,
+	m_pFlash(NULL), m_pFov(NULL), m_pCvar(NULL), m_pUpdate(NULL), m_pAb(NULL), m_pWm(NULL), m_void(NULL)/*,
 	m_pSh(NULL)*/ { }
 	bool load(IPlayerManager *pPlayerManager, IEngine *pEngine);
 	void unload();

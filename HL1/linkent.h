@@ -50,8 +50,8 @@ void do_link_ent(ENTITY_FN *pfnEntity, int *missing, char *entStr,
 	void entityName(entvars_t *pev) { \
 		static ENTITY_FN pfnEntity = NULL; \
 		static int missing=0; \
-		char *entStr; \
-		entStr = STRINGIZE(entityName, 0); \
+		char* entStr; \
+		entStr = (char*) STRINGIZE(entityName, 0); \
 		do_link_ent(&pfnEntity, &missing, entStr, pev); \
 	}
 

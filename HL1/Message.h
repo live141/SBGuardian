@@ -115,7 +115,7 @@ public:
 		m_vecTypes.clear();
 	}
 
-	void *arg(int i) {
+	void *arg(unsigned int i) {
 		if( m_vecTypes.empty() || i > m_vecTypes.size() )
 			return NULL;
 		vector<IType *>::iterator it = m_vecTypes.begin();

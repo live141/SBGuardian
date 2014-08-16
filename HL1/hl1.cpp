@@ -107,35 +107,28 @@ enginefuncs_t EngFuncs =
 	NULL,						// pfnSetModel()
 	NULL,						// pfnModelIndex()
 	NULL,						// pfnModelFrames()
-
 	NULL,						// pfnSetSize()
 	NULL,						// pfnChangeLevel()
 	NULL,						// pfnGetSpawnParms()
 	NULL,						// pfnSaveSpawnParms()
-
 	NULL,						// pfnVecToYaw()
 	NULL,						// pfnVecToAngles()
 	NULL,						// pfnMoveToOrigin()
 	NULL,						// pfnChangeYaw()
 	NULL,						// pfnChangePitch()
-
 	NULL,						// pfnFindEntityByString()
 	NULL,						// pfnGetEntityIllum()
 	NULL,						// pfnFindEntityInSphere()
 	NULL,						// pfnFindClientInPVS()
 	NULL,						// pfnEntitiesInPVS()
-
 	NULL,						// pfnMakeVectors()
 	NULL,						// pfnAngleVectors()
-
 	NULL,						// pfnCreateEntity()
 	NULL,						// pfnRemoveEntity()
 	NULL,						// pfnCreateNamedEntity()
-
 	NULL,						// pfnMakeStatic()
 	NULL,						// pfnEntIsOnFloor()
 	NULL,						// pfnDropToFloor()
-
 	NULL,						// pfnWalkMove()
 	NULL,						// pfnSetOrigin()
 	NULL,						// pfnEmitSound()
@@ -148,16 +141,13 @@ enginefuncs_t EngFuncs =
 	NULL,						// pfnTraceTexture()
 	NULL,						// pfnTraceSphere()
 	NULL,						// pfnGetAimVector()
-
 	NULL,						// pfnServerCommand()
 	NULL,						// pfnServerExecute()
 	NULL,						// pfnClientCommand()
-
 	NULL,						// pfnParticleEffect()
 	NULL,						// pfnLightStyle()
 	NULL,						// pfnDecalIndex()
 	NULL,						// pfnPointContents()
-
 	CServerPlugin::MessageBegin,
 	CServerPlugin::MessageEnd,
 	CServerPlugin::WriteByte,
@@ -168,23 +158,18 @@ enginefuncs_t EngFuncs =
 	CServerPlugin::WriteCoord,						// pfnWriteCoord()
 	CServerPlugin::WriteString,						// pfnWriteString()
 	CServerPlugin::WriteEntity,						// pfnWriteEntity()
-
 	NULL,						// pfnCVarRegister()
 	NULL,						// pfnCVarGetFloat()
 	NULL,						// pfnCVarGetString()
 	NULL,						// pfnCVarSetFloat()
 	NULL,						// pfnCVarSetString()
-
 	NULL,						// pfnAlertMessage()
 	NULL,						// pfnEngineFprintf()
-
 	NULL,						// pfnPvAllocEntPrivateData()
 	NULL,						// pfnPvEntPrivateData()
 	NULL,						// pfnFreeEntPrivateData()
-
 	NULL,						// pfnSzFromIndex()
 	NULL,						// pfnAllocString()
-
 	NULL, 						// pfnGetVarsOfEnt()
 	NULL,						// pfnPEntityOfEntOffset()
 	NULL,						// pfnEntOffsetOfPEntity()
@@ -193,37 +178,27 @@ enginefuncs_t EngFuncs =
 	NULL,						// pfnFindEntityByVars()
 	NULL,						// pfnGetModelPtr()
 	CServerPlugin::RegUserMsg,			// pfnRegUserMsg()
-
 	NULL,						// pfnAnimationAutomove()
 	NULL,						// pfnGetBonePosition()
-
 	NULL,						// pfnFunctionFromName()
 	NULL,						// pfnNameForFunction()
-
 	NULL,						// pfnClientPrintf()
 	NULL,						// pfnServerPrint()
-
 	NULL,						// pfnCmd_Args()
 	NULL,						// pfnCmd_Argv()
 	NULL,						// pfnCmd_Argc()
-
 	NULL,						// pfnGetAttachment()
-
 	NULL,						// pfnCRC32_Init()
 	NULL,						// pfnCRC32_ProcessBuffer()
 	NULL,						// pfnCRC32_ProcessByte()
 	NULL,						// pfnCRC32_Final()
-
 	NULL,						// pfnRandomLong()
 	NULL,						// pfnRandomFloat()
-
 	NULL,						// pfnSetView()
 	NULL,						// pfnTime()
 	NULL,						// pfnCrosshairAngle()
-
 	NULL,						// pfnLoadFileForMe()
 	NULL,						// pfnFreeFile()
-
 	NULL,						// pfnEndSection()
 	NULL,						// pfnCompareFileTime()
 	NULL,						// pfnGetGameDir()
@@ -233,12 +208,10 @@ enginefuncs_t EngFuncs =
 	NULL,						// pfnCreateFakeClient()
 	NULL,						// pfnRunPlayerMove()
 	NULL,						// pfnNumberOfEntities()
-
 	NULL,						// pfnGetInfoKeyBuffer()
 	NULL,						// pfnInfoKeyValue()
 	NULL,						// pfnSetKeyValue()
 	NULL,						// pfnSetClientKeyValue()
-
 	NULL,						// pfnIsMapValid()
 	NULL,						// pfnStaticDecal()
 	NULL,						// pfnPrecacheGeneric()
@@ -247,19 +220,15 @@ enginefuncs_t EngFuncs =
 	NULL,						// pfnIsDedicatedServer()
 	NULL,						// pfnCVarGetPointer()
 	NULL,						// pfnGetPlayerWONId()
-
 	NULL,						// pfnInfo_RemoveKey()
 	NULL,						// pfnGetPhysicsKeyValue()
 	NULL,						// pfnSetPhysicsKeyValue()
 	NULL,						// pfnGetPhysicsInfoString()
 	NULL,						// pfnPrecacheEvent()
 	NULL,						// pfnPlaybackEvent()
-
 	NULL,						// pfnSetFatPVS()
 	NULL,						// pfnSetFatPAS()
-
 	NULL,						// pfnCheckVisibility()
-
 	NULL,						// pfnDeltaSetField()
 	NULL,						// pfnDeltaUnsetField()
 	NULL,						// pfnDeltaAddEncoder()
@@ -420,6 +389,7 @@ extern "C" DLLEXP int GetEntityAPI2(DLL_FUNCTIONS *pFunctionTable, int *interfac
 
 extern "C" DLLEXP int GetEntityAPI( DLL_FUNCTIONS *pFunctionTable, int interfaceVersion )
 {
+	printf("SBGuardian: GetEntityAPI called...\r\n");
 	if ( !pFunctionTable || interfaceVersion != INTERFACE_VERSION )
 	{
 		return FALSE;
@@ -459,7 +429,7 @@ extern "C" DLLEXP void WINAPI GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngin
 	char gamedir[512];
 	char dll[512+256];
 	g_EngFuncs.pfnGetGameDir(gamedir);
-	int i;
+	unsigned int i;
 	printf("SBGuardian: Searching for game object...\r\n");
 	for(i = 0; i < sizeof(dllnames)/(sizeof(dllnames[1])*sizeof(char)); i++)
 	{
@@ -517,7 +487,7 @@ extern "C" DLLEXP void WINAPI GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngin
 
 		LoadFuncPtrsToDll(pengfuncsFromEngine);
 		LoadNewDLLFuncs(&g_NewDllFuncs);
-		// LoadEntityAPI2(&g_FunctionTable2);
+		//LoadEntityAPI2(&g_FunctionTable2);
 		LoadEntityAPI(&g_FunctionTable);
 		// g_CServerPlugin.Init();
 		return;

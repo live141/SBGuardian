@@ -20,7 +20,7 @@
 #include "Player.h"
 #include "hl1.h"
 
-#define STRING(offset) (const char *)(g_Globals->pStringBase + (int)offset)
+//#define STRING(offset) (const char *)(g_Globals->pStringBase + (int)offset)
 
 bool CRayTrace::traceWall(CVector& vecSrc, CVector& vecDest, IPlayer *pIgnore, vector<IPlayer *>& conHitHead, vector<IPlayer *>& conHitEnemy) {
 	CVector vecDirection = vecDest - vecSrc;

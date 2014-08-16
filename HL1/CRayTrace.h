@@ -45,7 +45,7 @@ private:
 
 public:
 	CRayTrace() : m_vecStart(0,0,0), m_vecEnd(0,0,0), m_vecDest(0,0,0), m_flFraction(0.0), m_iTraces(0), m_pHit(NULL),
-	m_conHead(NULL), m_conFoe(NULL), m_pIgnore(NULL), m_bHitHead(false) { }
+	m_pIgnore(NULL), m_bHitHead(false), m_conHead(NULL), m_conFoe(NULL) { }
 	virtual bool traceWall(CVector& vecSrc, CVector& vecDest, IPlayer *pIgnore, vector<IPlayer *>& conHitHead, vector<IPlayer *>& conHitEnemy);
 	bool hitWorld();
 };

@@ -191,6 +191,8 @@ void CCvarCheck::onCvarValue(IPlayer *pPlayer, const char *strName, const char *
 		if( flValue <= it->m_flValue )
 			strText = CStr::format("%s must be bigger than %f\n", strName, it->m_flValue);
 		break;
+	case type_unknown:
+		break;
 	}
 
 	CBuf buf;
@@ -213,6 +215,8 @@ void CCvarCheck::onCvarValue(IPlayer *pPlayer, const char *strName, const char *
 				it->m_sName.data(), flValue);
 			CFileMgr::log(this->getName(), buf.data());
 			pPlayer->ban(strText);
+			break;
+		case action_unknown:
 			break;
 		}
 	}
@@ -285,7 +289,7 @@ bool CCvarCheck::onCommand() {
 
 	if( iArgc == 2 ) {
 		const char *strText = CStr::format("CvarCheckk is %s\n", (isEnabled())?"enabled":"disabled");
-		printf(strText);
+		printf("%s", strText);
 	}
 
 	return true;

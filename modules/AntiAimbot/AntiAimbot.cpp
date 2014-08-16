@@ -163,7 +163,7 @@ bool CAntiAimbot::onCommand() {
 
 	if( m_pEngine->argc() == 2 ) {
 		const char *strText = CStr::format("AntiAimbot is %s\n", (isEnabled())?"enabled":"disabled");
-		printf(strText);
+		printf("%s", strText);
 	}
 	else {
 		int iMode = atoi(m_pEngine->argv(2));

@@ -2,7 +2,7 @@ HLSDK = /home/fabian/sdks_new/hl1sdk
 MM = /home/fabian/sdks_new/mm/metamod
 MMSOURCE = /home/fabian/sdks_new/mm_source/core
 
-OPT_FLAGS = -O3 -funroll-loops -pipe
+OPT_FLAGS = -O3 -funroll-loops -pipe -g
 GCC4_FLAGS = -fvisibility=hidden -fvisibility-inlines-hidden -fno-strict-aliasing -fno-stack-protector -msse2 -m32
 #CC = gcc-4.1
 CC = gcc
@@ -72,16 +72,18 @@ INCLUDE = \
 	-I$(MM) \
 	-I$(MMSOURCE)/sourcehook
 
-LINK = $(shell $(CC) -print-file-name=libstdc++.a) -m32 -lm -ldl -fPIC -fno-exceptions -fno-rtti -static-libgcc -Wno-non-virtual-dtor -shared
+LINK = -m32 -lm -ldl -fPIC -fno-exceptions -fno-rtti -static-libgcc -Wno-non-virtual-dtor -shared #$(shell $(CC) -print-file-name=libstdc++.a)
 
 ####################################################################################################### 
 OBJ_LINUX := $(OBJECTS:%.cpp=$(BINDIR)/%.o)
 
 $(BINDIR)/%.o: %.cpp
-	@mkdir -p $(shell dirname $@)
-	$(CC) $(INCLUDE) $(CFLAGS) -o $@ -c $<
+	@mkdir -p $(shell dirname $@) 2> /dev/null
+	@echo "Compiling $<..."
+	@$(CC) $(INCLUDE) $(CFLAGS) -o $@ -c $<
 #######################################################################################################
-default: $(BINDIR) $(OBJ_LINUX)
+default: $(BINDIR)/$(BINARY)
+$(BINDIR)/$(BINARY): $(BINDIR) $(OBJ_LINUX)
 	$(CC) $(INCLUDE) $(OBJ_LINUX) $(LINK) -o $(BINDIR)/$(BINARY)
 clean:
 	@rm -f $(BINDIR)/$(BINARY) $(OBJ_LINUX)

@@ -22,7 +22,7 @@
 #include "Engine.h"
 #include "../CStr.h"
 
-#define STRING(offset) (const char *)(g_Globals->pStringBase + (int)offset)
+// #define STRING(offset) (const char *)(g_Globals->pStringBase + (int)offset)
 
 void CPlayer::onConnect(edict_t *pEdict) {
 	m_pEnt = pEdict;

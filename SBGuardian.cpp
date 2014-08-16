@@ -62,12 +62,27 @@ void CSBGuardian::unload() {
 	m_bLoaded = false;
 
 	// unload all modules
+	/*
 	IModule **pModule = (IModule **) &m_pWh;
 	while( *pModule != NULL ) {
 		delete *pModule;
 		*pModule = NULL;
 		pModule++;
 	}
+	*/
+	delete m_pWh;
+	m_pWh = NULL;
+	delete m_pFlash;
+	m_pFlash = NULL;
+	delete m_pFov;
+	m_pFov = NULL;
+	delete m_pCvar;
+	m_pCvar = NULL;
+	delete m_pAb;
+	m_pAb = NULL;
+	delete m_pWm;
+	m_pWm = NULL;
+
 }
 
 void CSBGuardian::onMapChange() {
@@ -130,7 +145,7 @@ bool CSBGuardian::onCheckTransmit(IPlayer *pPlayer, IPlayer *pEnt) {
 	if(pPlayer->isDying())
 		return true;
 
-	bool alive = true;
+	//bool alive = true;
 
 	if(!pPlayer->isAlive())
 	{
@@ -142,7 +157,7 @@ bool CSBGuardian::onCheckTransmit(IPlayer *pPlayer, IPlayer *pEnt) {
 		if(p != NULL)
 		{
 			pPlayer = p;
-	        alive = false;
+	        	//alive = false;
 		}
 	}
 

@@ -41,7 +41,7 @@ bool CFOVCheck::onCommand() {
 
 	if( m_pEngine->argc() == 2 ) {
 		const char *strText = CStr::format("FOVCheck is %s\n", (isEnabled())?"enabled":"disabled");
-		printf(strText);
+		printf("%s", strText);
 	}
 	else {
 		setEnabled(atoi(m_pEngine->argv(2)));

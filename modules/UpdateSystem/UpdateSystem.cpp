@@ -31,11 +31,13 @@ void CUpdateSystem::init(IEngine *pEngine, IPlayerManager *pPlayerManager) {
 	// printf("%s\n", buf);
 	const char *pChar = strrchr(buf, _FS);
 	size_t iLen = pChar-buf+1;
-	m_strPath = new char[iLen+1];
+	//m_strPath = new char[iLen+1];
+	m_strPath = (char*) malloc(iLen+1);
 	memcpy(m_strPath, buf, iLen);
 	m_strPath[iLen] = 0;
 	iLen = strlen(++pChar);
-	m_strFile = new char[iLen+1];
+	//m_strFile = new char[iLen+1];
+	m_strFile = (char*) malloc(iLen+1);
 	memcpy(m_strFile, pChar, iLen);
 	m_strFile[iLen] = 0;
 	printf("[SBG]: Loaded File: %s%s\n", m_strPath, m_strFile);
@@ -207,7 +209,7 @@ bool CUpdateSystem::onCommand() {
 
 	if( m_pEngine->argc() == 2 ) {
 		const char *strText = CStr::format("UpdateSystem is %s\n", (isEnabled())?"enabled":"disabled");
-		printf(strText);
+		printf("%s", strText);
 	}
 	else {
 		setEnabled(atoi(m_pEngine->argv(2)));

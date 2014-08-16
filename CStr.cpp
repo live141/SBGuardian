@@ -24,13 +24,11 @@
 const char* CStr::format(const char *fmt, ...) {
 	va_list ap;
 	static char buf[1024];
-	unsigned int len;
 
 	va_start(ap, fmt);
 	vsnprintf(buf, sizeof(buf), fmt, ap);
 	va_end(ap);
-	len=strlen(buf);
-
+	
 	return buf;
 }
 

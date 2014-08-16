@@ -31,7 +31,7 @@ void CCacheMgr::clear() {
 	if( iEnd > m_iMaxClients )
 		iEnd = m_iMaxClients;
 	for( ; m_iPtr <= iEnd; m_iPtr++ ) {
-		for( size_t j = 1; j <= m_iMaxClients; j++ )
+		for( int j = 1; j <= m_iMaxClients; j++ )
 			m_Cache[m_iPtr][j].clear();
 	}
 	if( m_iPtr > m_iMaxClients )
@@ -251,7 +251,7 @@ bool CAntiWallhack::onCommand() {
 
 	if( m_pEngine->argc() == 2 ) {
 		const char *strText = CStr::format("AntiWH is %s\n", (isEnabled())?"enabled":"disabled");
-		printf(strText);
+		printf("%s", strText);
 	}
 	else {
 		setEnabled(atoi(m_pEngine->argv(2)));

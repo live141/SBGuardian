@@ -32,12 +32,12 @@
 #include <enginecallbacks.h>
 #define MRES_IGNORED 1
 #define MRES_SUPERCEDE 4
-#define RETURN(a, c) \
+#define RETURN(a, c) do {\
 	if(a == MRES_IGNORED) return c; \
-	else return;
-#define RETURN_VALUE(a, b, c) \
+	else return; } while(0);
+#define RETURN_VALUE(a, b, c) do {\
 	if(a == MRES_IGNORED) return c; \
-	else return b;
+	else return b; } while(0);
 // #include <util.h>
 #endif
 
@@ -144,8 +144,9 @@ void CServerPlugin::ClientDisconnect(edict_t *pent) {
 
 void CServerPlugin::ClientCommand(edict_t *pent) {
 	CPlayer *pPlayer = g_PlayerManager.getPlayer(pent);
-	if( pPlayer == NULL )
+	if( pPlayer == NULL ) {
 		RETURN(MRES_IGNORED, g_FunctionTable.pfnClientCommand(pent));
+	}
 
 	g_PlayerManager.onCommand(pent);
 
@@ -183,8 +184,9 @@ void CServerPlugin::OnQueryCvarValueFinished(const edict_t *pEnt, int requestID,
 }
 
 int CServerPlugin::CheckTransmit(struct entity_state_s *state, int e, edict_t *ent, edict_t *host, int hostflags, int player, unsigned char *pSet) {
-	if(player != 1 || host == NULL || ent == NULL)
+	if(player != 1 || host == NULL || ent == NULL) {
 		RETURN_VALUE(MRES_IGNORED, 0, g_FunctionTable.pfnAddToFullPack(state, e, ent, host, hostflags, player, pSet));
+	}
 
         // Don't send spectators to other players
 		if ( ( ent->v.flags & FL_SPECTATOR ) && ( ent != host ) ) {
@@ -199,8 +201,9 @@ int CServerPlugin::CheckTransmit(struct entity_state_s *state, int e, edict_t *e
 			}
 		}
 
-		if(!g_SBG.onCheckTransmit(g_PlayerManager.getPlayer(host), g_PlayerManager.getPlayer(ent)))
+		if(!g_SBG.onCheckTransmit(g_PlayerManager.getPlayer(host), g_PlayerManager.getPlayer(ent))) {
 	                RETURN_VALUE(MRES_SUPERCEDE, 0, 0);
+		}
 		RETURN_VALUE(MRES_IGNORED, 0, g_FunctionTable.pfnAddToFullPack(state, e, ent, host, hostflags, player, pSet));
 }
 

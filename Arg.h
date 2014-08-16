@@ -69,8 +69,8 @@ private:
 	}
 
 public:
-	CArg() : m_iLen(0), m_strCmd(NULL), m_iArgc(0), m_strArgs(NULL) { }
-	CArg(const char *strCmd) : m_iLen(0), m_strCmd(NULL), m_iArgc(0), m_strArgs(NULL) {
+	CArg() : m_iLen(0), m_iArgc(0), m_strCmd(NULL), m_strArgs(NULL) { }
+	CArg(const char *strCmd) : m_iLen(0), m_iArgc(0), m_strCmd(NULL), m_strArgs(NULL) {
 		_parse(strCmd);
 	}
 
@@ -93,7 +93,7 @@ public:
 		return m_iArgc;
 	}
 
-	const char *argv(int iIndex) const {
+	const char *argv(unsigned int iIndex) const {
 		if( iIndex < 0 || iIndex > m_iArgc-1 ) {
 			return NULL;
 		}

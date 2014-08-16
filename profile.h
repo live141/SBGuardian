@@ -16,37 +16,15 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 **/
 
-#ifndef CSTEAMID_H_
-#define CSTEAMID_H_
+#ifndef _PROFILE_H_
+#define _PROFILE_H_
 
-#ifdef WIN32
-#define snprintf _snprintf
+#include <stdint.h>
+
+inline uint64_t _rdtsc() {
+	uint64_t tmp;
+	asm volatile ("rdtsc" : "=a"(((uint32_t*) &tmp)[0]) "=d"(((uint32_t*) &tmp))[1]);
+	return tmp;
+}
+
 #endif
-
-class CSteamId {
-private:
-	unsigned int m_iId;
-	static char bitUniverse;
-
-public:
-	CSteamId() : m_iId(0) { }
-	CSteamId(unsigned int iId) : m_iId(iId) { }
-	CSteamId(const char *strId);
-
-	const char *getStatic() const;
-
-	unsigned int getId() const {
-		return m_iId;
-	}
-
-	bool operator ==(CSteamId SteamId) const {
-		return ( m_iId == SteamId.m_iId );
-	}
-
-	CSteamId operator =(CSteamId SteamId) {
-		m_iId = SteamId.m_iId;
-		return *this;
-	}
-};
-
-#endif /* CSTEAMID_H_ */

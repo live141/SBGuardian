@@ -55,7 +55,7 @@ bool CWarmodus::onCommand() {
 
 	if( m_pEngine->argc() == 2 ) {
 		const char *strText = CStr::format("Warmodus is %s\n", (isEnabled())?"enabled":"disabled");
-		printf(strText);
+		printf("%s", strText);
 		return true;
 	}
 

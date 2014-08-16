@@ -71,7 +71,7 @@ public:
 			m_aData[i] = tmp[i];
 		}
 		// memcpy(m_aData+iOff, tmp+iOff+1, (m_iSize-iOff));
-		for(int i = iOff; i < (m_iSize-iOff); i++) {
+		for(size_t i = iOff; i < (m_iSize-iOff); i++) {
 			m_aData[i] = tmp[i];
 		}
 
@@ -120,7 +120,7 @@ public:
 	Type *find(const Type& data) {
 		if( m_iSize == 0 )
 			return end();
-		for( int i = 0; i < m_iSize; i++ ) {
+		for( unsigned int i = 0; i < m_iSize; i++ ) {
 			if( data == m_aData[i] )
 				return &m_aData[i];
 		}

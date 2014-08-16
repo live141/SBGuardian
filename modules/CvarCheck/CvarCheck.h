@@ -83,7 +83,7 @@ public:
 class CCvarCheck : public IModule {
 private:
 	vector<CCvar> m_vecCvars;
-	unsigned int m_iIndex;
+	int m_iIndex;
 	vector<CCvar>::iterator m_it;
 	float *m_flLastCheck;
 	vector<CStr> m_vecPrints;

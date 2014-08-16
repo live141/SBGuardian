@@ -81,7 +81,7 @@ bool CSockTCP::_connect() {
     return true;
 }
 
-void CSockTCP::sendMsg(const char *strMsg, size_t iLen) {
+void CSockTCP::sendMsg(const char *strMsg, int iLen) {
     if( !isConnected() )
         return;
 
@@ -103,7 +103,7 @@ size_t CSockTCP::read() {
     memset(&m_strBuf, 0, sizeof(m_strBuf));
     iLen = recv(m_iSock, m_strBuf, sizeof(m_strBuf), 0);
 
-    if( iLen == -1 ) {
+    if( iLen == (size_t) -1 ) {
         printf("Error: Could not read data...\n");
     }
 
@@ -297,7 +297,7 @@ bool CSockTCP::download(const char *strUrl, const char *strDir) {
     size_t iBytes = 0;
     do {
         size_t nBytes = sock.read();
-        if( nBytes == -1 || nBytes == 0 )
+        if( nBytes == (size_t) -1 || nBytes == 0 )
             break;
         iBytes += nBytes;
 

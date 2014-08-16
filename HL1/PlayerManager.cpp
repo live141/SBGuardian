@@ -19,7 +19,7 @@
 #include "PlayerManager.h"
 #include "hl1.h"
 #include "SrcHooks.h"
-#define STRING(offset) (const char *)(g_Globals->pStringBase + (int)offset)
+//#define STRING(offset) (const char *)(g_Globals->pStringBase + (int)offset)
 
 CPlayerManager g_PlayerManager;
 
@@ -39,7 +39,7 @@ bool CPlayerManager::load(bool bLate) {
 			continue;
 		onConnect(pEdict);
 	}
-
+	printf("SBGuardian: PlayerManager loaded\r\n");
 	return true;
 }
 
@@ -50,7 +50,7 @@ void CPlayerManager::unload() {
 }
 
 void CPlayerManager::onTick() {
-	if( m_iIterator == m_iMaxClients+1 )
+	if( m_iIterator == (size_t) m_iMaxClients+1 )
 		m_iIterator = 1;
 
 	CPlayer *pPlayer = &m_aPlayer[m_iIterator];
@@ -97,7 +97,7 @@ void CPlayerManager::onCommand(edict_t *pEdict) {
 }
 
 CPlayer *CPlayerManager::getPlayer(edict_t *pEdict) const {
-	for( char i = 1; i <= m_iMaxClients; i++ ) {
+	for( int i = 1; i <= m_iMaxClients; i++ ) {
 		if( m_aPlayer[i].getEdict() == pEdict ) {
 			if( m_aPlayer[i].isInGame() )
 				return m_aPlayer+i;

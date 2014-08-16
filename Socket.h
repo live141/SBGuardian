@@ -43,7 +43,7 @@ public:
     virtual bool _connect() = 0;
     virtual void disconnect() = 0;
     virtual void setNonBlocking(bool nonBlocking) = 0;
-    virtual void sendMsg(const char *strMsg, size_t iLen = 0) = 0;
+    virtual void sendMsg(const char *strMsg, int iLen = 0) = 0;
     virtual size_t read() = 0;
     virtual bool isReadReady(unsigned int sec_Timeout) = 0;
     virtual bool isReadyWrite(unsigned int sec_Timeout) = 0;
@@ -84,7 +84,7 @@ public:
     virtual void disconnect();
     virtual void setKeepAlive(bool keepAlive);
     virtual void setNonBlocking(bool nonBlocking);
-    virtual void sendMsg(const char *strMsg, size_t iLen = 0);
+    virtual void sendMsg(const char *strMsg, int iLen = 0);
     virtual size_t read();
     virtual const char *readLine();
     virtual bool isReadReady(unsigned int sec_Timeout);

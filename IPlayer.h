@@ -81,8 +81,8 @@ public:
 		return m_SteamId;
 	}
 
-	char getIndex() const {
-		return m_cIndex;
+	unsigned int getIndex() const {
+		return (unsigned int) m_cIndex;
 	}
 
 	int getUserId() const {
