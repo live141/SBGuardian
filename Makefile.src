@@ -134,14 +134,14 @@ INCLUDE += -I. \
 OBJ_LINUX := $(OBJECTS:%.cpp=$(BINDIR)/%.o)
 
 $(BINDIR)/%.o: %.cpp
-	@mkdir -p $(shell dirname $@)
-	$(CC) $(INCLUDE) $(CFLAGS) -o $@ -c $<
+	@mkdir -p $(shell dirname $@) 2> /dev/null
+	@echo "Compiling $<..."
+	@$(CC) $(INCLUDE) $(CFLAGS) -o $@ -c $<
 #######################################################################################################
-default: $(BINDIR) $(OBJ_LINUX)
+default: $(BINDIR)/$(BINARY)
+$(BINDIR)/$(BINARY): $(OBJ_LINUX)
 	$(CC) $(INCLUDE) $(OBJ_LINUX) $(LINK) -o $(BINDIR)/$(BINARY)
 clean:
 	@rm -f $(BINDIR)/$(BINARY) $(OBJ_LINUX)
-$(BINDIR):
-	@mkdir $(BINDIR) 2> /dev/null
 
 .PHONY: clean default

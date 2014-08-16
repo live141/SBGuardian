@@ -83,11 +83,9 @@ $(BINDIR)/%.o: %.cpp
 	@$(CC) $(INCLUDE) $(CFLAGS) -o $@ -c $<
 #######################################################################################################
 default: $(BINDIR)/$(BINARY)
-$(BINDIR)/$(BINARY): $(BINDIR) $(OBJ_LINUX)
+$(BINDIR)/$(BINARY): $(OBJ_LINUX)
 	$(CC) $(INCLUDE) $(OBJ_LINUX) $(LINK) -o $(BINDIR)/$(BINARY)
 clean:
 	@rm -f $(BINDIR)/$(BINARY) $(OBJ_LINUX)
-$(BINDIR):
-	@mkdir $(BINDIR) 2> /dev/null
 
 .PHONY: clean default
