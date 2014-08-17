@@ -18,6 +18,7 @@
 
 #include "AntiWallhack.h"
 #include <stdio.h>
+#include "../../profile.h"
 
 void CCacheMgr::add(IPlayer *pPlayer, IPlayer *pEnemy, int iPos, eCacheStatus cStatus) {
 	int iPlayer = pPlayer->getIndex();
@@ -92,6 +93,10 @@ bool CAntiWallhack::transmitSound(IPlayer *pPlayer, IPlayer *pEnt) {
 bool CAntiWallhack::isVisible(IPlayer *pPlayer, IPlayer *pEnemy) {
 	if( !isEnabled() )
 		return true;
+
+	PROFILE_SETUP(isVisible, 400);
+	PROFILE_UPDATE(isVisible);
+	PROFILE_PRINT(isVisible);
 
 	if( m_Cache.isSeeable(pPlayer, pEnemy) )
 		return true;

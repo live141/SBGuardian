@@ -19,10 +19,17 @@
 #include "CRayTrace.h"
 #include "Player.h"
 #include "hl1.h"
+#undef min
+#undef max
+#include "../profile.h"
 
 //#define STRING(offset) (const char *)(g_Globals->pStringBase + (int)offset)
 
 bool CRayTrace::traceWall(CVector& vecSrc, CVector& vecDest, IPlayer *pIgnore, vector<IPlayer *>& conHitHead, vector<IPlayer *>& conHitEnemy) {
+	PROFILE_SETUP(RAYTRACE, 300);
+	PROFILE_UPDATE(RAYTRACE);
+	PROFILE_PRINT(RAYTRACE);
+
 	CVector vecDirection = vecDest - vecSrc;
 	vecDirection.normalize();
 	// m_vecDest = vecSrc + vecDirection * CVector((float *) &g_Globals->v_forward.x).len();
@@ -50,6 +57,10 @@ bool CRayTrace::traceWall(CVector& vecSrc, CVector& vecDest, IPlayer *pIgnore, v
 }
 
 bool CRayTrace::_traceWall(CVector& vecSrc, CVector& vecDest, edict_t *pIgnore) {
+	PROFILE_SETUP(RAYTRACE, 300);
+	PROFILE_UPDATE(RAYTRACE);
+	PROFILE_PRINT(RAYTRACE);
+
 	if( m_iTraces == MAX_TRACES )
 		return true;
 	m_iTraces++;

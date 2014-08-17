@@ -52,7 +52,7 @@ private:
 	uint16_t _num;
 	uint16_t _idx;
 public:
-	Profile() : _histogram(NULL), _tsc(0), _num(0), _idx(0) {}
+	Profile(void) : _histogram(NULL), _tsc(0), _num(0), _idx(0) {}
 	Profile(uint16_t num) : _histogram(NULL), _tsc(0), _num(num), _idx(0) {
 		_histogram = (uint64_t*) calloc(num, sizeof(uint64_t));
 	}
@@ -60,16 +60,16 @@ public:
 		if( _histogram != NULL )
 			free(_histogram);
 	}
-	void start() {
+	void start(void) {
 		_tsc = _rdtsc();
 	}
-	void update() {
+	void update(void) {
 		uint64_t tmp = _rdtsc();
 		_histogram[_idx] = tmp - _tsc;
 		_idx = (_idx+1)%_num;
 		_tsc = tmp;
 	}
-	uint64_t min() {
+	uint64_t min(void) {
 		uint64_t min = 0xffffffffffffffff;
 		uint16_t i;
 		for(i = 0; i < _num; ++i) {
@@ -78,7 +78,7 @@ public:
 		}
 		return min;
 	}
-	uint64_t max() {
+	uint64_t max(void) {
 		uint64_t max = 0;
 		uint16_t i;
 		for(i = 0; i < _num; ++i) {
@@ -87,7 +87,7 @@ public:
 		}
 		return max;
 	}
-	uint64_t mean() {
+	uint64_t mean(void) {
 		uint64_t mean = 0;
 		uint16_t i;
 		for(i = 0; i < _num; ++i) {
