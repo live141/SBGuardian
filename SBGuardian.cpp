@@ -46,24 +46,9 @@ bool CSBGuardian::load(IPlayerManager *pPlayerManager, IEngine *pEngine) {
 	//m_vecModule.push_back(m_pSh);
 
 	// init all modules
-
 	for(vector<IModule*>::iterator it = m_vecModule.begin(); it < m_vecModule.end(); ++it) {
 		(*it)->init(pEngine, pPlayerManager);
 	}
-
-	/*
-	IModule **pModule = (IModule **) &m_pWh;
-	while( *pModule != NULL ) {
-		pModule[0]->init(pEngine, pPlayerManager);
-		pModule++;
-	}
-	*/
-	m_pWh->init(pEngine, pPlayerManager);
-	m_pFlash->init(pEngine, pPlayerManager);
-	m_pFov->init(pEngine, pPlayerManager);
-	m_pCvar->init(pEngine, pPlayerManager);
-	m_pAb->init(pEngine, pPlayerManager);
-	m_pWm->init(pEngine, pPlayerManager);
 
 	m_pEngine->command("exec sbg.cfg\n");
 
@@ -75,32 +60,17 @@ void CSBGuardian::unload() {
 	m_bLoaded = false;
 
 	// unload all modules
-	/*
-	IModule **pModule = (IModule **) &m_pWh;
-	while( *pModule != NULL ) {
-		delete *pModule;
-		*pModule = NULL;
-		pModule++;
-	}
-	*/
 	for(vector<IModule*>::iterator it = m_vecModule.begin(); it < m_vecModule.end(); ++it) {
-		delete it;
+		delete *it;
 	}
 	m_vecModule.clear();
-	delete m_pWh;
 	m_pWh = NULL;
-	delete m_pFlash;
 	m_pFlash = NULL;
-	delete m_pFov;
 	m_pFov = NULL;
-	delete m_pCvar;
 	m_pCvar = NULL;
-	delete m_pAb;
 	m_pAb = NULL;
-	delete m_pWm;
 	m_pWm = NULL;
-	//delete m_pUpdate;
-	//m_pUpdate = NULL;
+	m_pUpdate = NULL;
 }
 
 void CSBGuardian::onMapChange() {
