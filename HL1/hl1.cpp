@@ -50,8 +50,8 @@ GETENTITYAPI addrEntityAPI = NULL;
 
 // sets dest's ptrs to source's ptrs if source-ptr != NULL
 void setPtr(void *destination, void *source, size_t size) {
-	int **src = (int **) source;
-	int **dest = (int **) destination;
+	void **src = (void**) source;
+	void **dest = (void**) destination;
 	for( size_t i = 0; i < size/sizeof(void*); i++ ) {
 		if( src[i] != NULL )
 			dest[i] = src[i];
@@ -320,6 +320,21 @@ extern "C" DLLEXP int GetEntityAPI2(DLL_FUNCTIONS *pFunctionTable, int *interfac
 #ifndef STANDALONE
 	memcpy(pFunctionTable, &FunctionTable, sizeof(DLL_FUNCTIONS));
 #else
+	int ret;
+	if( addrEntityAPI2 != NULL ) {
+		ret = addrEntityAPI2(&g_FunctionTable, &InterfaceVersion);
+		if( ret != TRUE ) {
+			printf("SBGuardian: Version mismatch (DLLAPI2)!");
+			exit(-1);
+		}
+	}
+	else {
+		ret = addrEntityAPI(&g_FunctionTable, InterfaceVersion);
+		if( ret != TRUE ) {
+			printf("SBGuardian: Version mismatch (DLLAPI)!\n");
+			exit(-1);
+		}
+	}
 	memcpy(pFunctionTable, &g_FunctionTable, sizeof(DLL_FUNCTIONS));
 	setPtr(pFunctionTable, &FunctionTable, sizeof(DLL_FUNCTIONS));
 #endif
@@ -338,6 +353,11 @@ extern "C" DLLEXP int GetEntityAPI( DLL_FUNCTIONS *pFunctionTable, int interface
 #ifndef STANDALONE
 	memcpy(pFunctionTable, &FunctionTable, sizeof(DLL_FUNCTIONS));
 #else
+	int ret = addrEntityAPI(&g_FunctionTable, InterfaceVersion);
+	if( ret != TRUE ) {
+		printf("SBGuardian: Version mismatch (DLLAPI)!\n");
+		exit(-1);
+	}
 	memcpy(pFunctionTable, &g_FunctionTable, sizeof(DLL_FUNCTIONS));
 	setPtr(pFunctionTable, &FunctionTable, sizeof(DLL_FUNCTIONS));
 #endif
@@ -350,6 +370,12 @@ extern "C" DLLEXP int GetNewDLLFunctions( NEW_DLL_FUNCTIONS *pNewFunctionTable, 
 #ifndef STANDALONE
 	memcpy(pNewFunctionTable, &NewDllFuncs, sizeof(NEW_DLL_FUNCTIONS));
 #else
+	int ret = addrNewDllFuncs(&g_NewDllFuncs, &NewInterfaceVersion);
+	if( ret != TRUE ) {
+		printf("SBGuardian: Version mismatch (NewDLLAPI)!\n");
+		exit(-1);
+	}
+
 	memcpy(pNewFunctionTable, &g_NewDllFuncs, sizeof(NEW_DLL_FUNCTIONS));
 	setPtr(pNewFunctionTable, &NewDllFuncs, sizeof(NEW_DLL_FUNCTIONS));
 #endif
@@ -358,7 +384,6 @@ extern "C" DLLEXP int GetNewDLLFunctions( NEW_DLL_FUNCTIONS *pNewFunctionTable, 
 
 extern "C" DLLEXP void WINAPI GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, globalvars_t *pGlobals )
 {
-	int ret;
 	memcpy(&g_EngFuncs, pengfuncsFromEngine, sizeof(enginefuncs_t));
 	memcpy(&g_engfuncs, pengfuncsFromEngine, sizeof(enginefuncs_t));
 	g_Globals = pGlobals;
@@ -409,30 +434,11 @@ extern "C" DLLEXP void WINAPI GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngin
 	addrFuncPtrsToDll = (GEF) Dll.sym("GiveFnptrsToDll");
 	addrNewDllFuncs = (GETNEWDLLFUNCTIONS) Dll.sym("GetNewDLLFunctions");
 	addrEntityAPI2 = (GETENTITYAPI2) Dll.sym("GetEntityAPI2");
-	if( addrEntityAPI2 == NULL )
-		addrEntityAPI2 = (GETENTITYAPI2) Dll.sym("_Z13GetEntityAPI2P13DLL_FUNCTIONSPi");
+	//if( addrEntityAPI2 == NULL )
+	//	addrEntityAPI2 = (GETENTITYAPI2) Dll.sym("_Z13GetEntityAPI2P13DLL_FUNCTIONSPi");
 	addrEntityAPI = (GETENTITYAPI) Dll.sym("GetEntityAPI");
 
 	addrFuncPtrsToDll(pengfuncsFromEngine, g_Globals);
-	ret = addrNewDllFuncs(&g_NewDllFuncs, &NewInterfaceVersion);
-	if( ret != TRUE ) {
-		printf("SBGuardian: Version mismatch (NewDLLAPI)!\n");
-		exit(-1);
-	}
-	if( addrEntityAPI2 != NULL ) {
-		ret = addrEntityAPI2(&g_FunctionTable, &InterfaceVersion);
-		if( ret != TRUE ) {
-			printf("SBGuardian: Version mismatch (DLLAPI2)!");
-			exit(-1);
-		}
-	}
-	else {
-		ret = addrEntityAPI(&g_FunctionTable, InterfaceVersion);
-		if( ret != TRUE ) {
-			printf("SBGuardian: Version mismatch (DLLAPI)!\n");
-			exit(-1);
-		}
-	}
 #endif
 }
 
