@@ -30,14 +30,14 @@ inline uint64_t _rdtsc() {
 
 class Profile {
 private:
-	uint32_t* _histogram;
-	uint32_t _tsc;
+	uint64_t* _histogram;
+	uint64_t _tsc;
 	uint16_t _num;
 	uint16_t _idx;
 public:
 	Profile() : _histogram(NULL), _tsc(0), _num(0), _idx(0) {}
 	Profile(uint16_t num) : _histogram(NULL), _tsc(0), _num(num), _idx(0) {
-		_histogram = (uint32_t*) malloc(sizeof(uint32_t)*num);
+		_histogram = (uint64_t*) calloc(num, sizeof(uint64_t));
 	}
 	~Profile() {
 		if( _histogram != NULL )
@@ -47,12 +47,13 @@ public:
 		_tsc = _rdtsc();
 	}
 	void update() {
-		uint32_t tmp = _rdtsc();
-		_histogram[++_idx%_num] = tmp - _tsc;
+		uint64_t tmp = _rdtsc();
+		_histogram[_idx] = tmp - _tsc;
+		_idx = (_idx+1)%_num;
 		_tsc = tmp;
 	}
-	uint32_t min() {
-		uint32_t min = 0xffffffff;
+	uint64_t min() {
+		uint64_t min = 0xffffffffffffffff;
 		uint16_t i;
 		for(i = 0; i < _num; ++i) {
 			if( min > _histogram[i] )
@@ -60,8 +61,8 @@ public:
 		}
 		return min;
 	}
-	uint32_t max() {
-		uint32_t max = 0;
+	uint64_t max() {
+		uint64_t max = 0;
 		uint16_t i;
 		for(i = 0; i < _num; ++i) {
 			if( max < _histogram[i] )
@@ -69,7 +70,7 @@ public:
 		}
 		return max;
 	}
-	uint32_t mean() {
+	uint64_t mean() {
 		uint64_t mean = 0;
 		uint16_t i;
 		for(i = 0; i < _num; ++i) {
