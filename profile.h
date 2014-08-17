@@ -20,11 +20,64 @@
 #define _PROFILE_H_
 
 #include <stdint.h>
+#include <stdlib.h>
 
 inline uint64_t _rdtsc() {
 	uint64_t tmp;
-	asm volatile ("rdtsc" : "=a"(((uint32_t*) &tmp)[0]) "=d"(((uint32_t*) &tmp))[1]);
+	asm volatile ("rdtsc" : "=a"(((uint32_t*) &tmp)[0]), "=d"(((uint32_t*) &tmp)[1]) : :);
 	return tmp;
 }
+
+class Profile {
+private:
+	uint32_t* _histogram;
+	uint32_t _tsc;
+	uint16_t _num;
+	uint16_t _idx;
+public:
+	Profile() : _histogram(NULL), _tsc(0), _num(0), _idx(0) {}
+	Profile(uint16_t num) : _histogram(NULL), _tsc(0), _num(num), _idx(0) {
+		_histogram = (uint32_t*) malloc(sizeof(uint32_t)*num);
+	}
+	~Profile() {
+		if( _histogram != NULL )
+			free(_histogram);
+	}
+	void start() {
+		_tsc = _rdtsc();
+	}
+	void update() {
+		uint32_t tmp = _rdtsc();
+		_histogram[++_idx%_num] = tmp - _tsc;
+		_tsc = tmp;
+	}
+	uint32_t min() {
+		uint32_t min = 0xffffffff;
+		uint16_t i;
+		for(i = 0; i < _num; ++i) {
+			if( min > _histogram[i] )
+				min = _histogram[i];
+		}
+		return min;
+	}
+	uint32_t max() {
+		uint32_t max = 0;
+		uint16_t i;
+		for(i = 0; i < _num; ++i) {
+			if( max < _histogram[i] )
+				max = _histogram[i];
+		}
+		return max;
+	}
+	uint32_t mean() {
+		uint64_t mean = 0;
+		uint16_t i;
+		for(i = 0; i < _num; ++i) {
+			mean += _histogram[i];
+		}
+		mean /= _num;
+		return mean;
+	}
+};
 
 #endif
