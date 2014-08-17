@@ -2,7 +2,7 @@ HLSDK = /home/fabian/sdks_new/hl1sdk
 MM = /home/fabian/sdks_new/mm/metamod
 MMSOURCE = /home/fabian/sdks_new/mm_source/core
 
-OPT_FLAGS = -O3 -funroll-loops -pipe -g
+OPT_FLAGS = -O2 -funroll-loops -pipe
 GCC4_FLAGS = -fvisibility=hidden -fvisibility-inlines-hidden -fno-strict-aliasing -fno-stack-protector -msse2 -m32
 #CC = gcc-4.1
 CC = gcc
@@ -53,6 +53,13 @@ OBJECTS += \
 	sourcehook_impl_cvfnptr.cpp
 	
 	
+ifeq "$(DEBUG)" "true"
+	CFLAGS += -g3
+endif
+
+ifeq "$(PROFILE)" "true"
+	CFLAGS += -pg
+endif
 
 GCC_VERSION := $(shell $(CC) -dumpversion >&1 | cut -b1)
 CFLAGS += -D_LINUX -DNDEBUG -D_snprintf=snprintf -D_vsnprintf=vsnprintf \
@@ -84,7 +91,8 @@ $(BINDIR)/%.o: %.cpp
 #######################################################################################################
 default: $(BINDIR)/$(BINARY)
 $(BINDIR)/$(BINARY): $(OBJ_LINUX)
-	$(CC) $(INCLUDE) $(OBJ_LINUX) $(LINK) -o $(BINDIR)/$(BINARY)
+	@echo "Linking $@..."
+	@$(CC) $(INCLUDE) $(OBJ_LINUX) $(LINK) -o $(BINDIR)/$(BINARY)
 clean:
 	@rm -f $(BINDIR)/$(BINARY) $(OBJ_LINUX)
 

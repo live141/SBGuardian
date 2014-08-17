@@ -49,6 +49,13 @@ OBJECTS += \
 	sourcehook_impl_cproto.cpp \
 	sourcehook_impl_cvfnptr.cpp
 
+ifeq "$(DEBUG)" "true"
+	CFLAGS += -g3
+endif
+
+ifeq "$(PROFILE)" "true"
+	CFLAGS += -pg
+endif
 
 LINK = $(shell $(CC) -print-file-name=libstdc++.a) -m32 -lm -ldl -fPIC -fno-exceptions -fno-rtti -static-libgcc -Wno-non-virtual-dtor -shared \
 	$(HL2LIB)/tier1_i486.a $(LIB_PREFIX)vstdlib$(LIB_SUFFIX) $(LIB_PREFIX)tier0$(LIB_SUFFIX)
@@ -140,7 +147,8 @@ $(BINDIR)/%.o: %.cpp
 #######################################################################################################
 default: $(BINDIR)/$(BINARY)
 $(BINDIR)/$(BINARY): $(OBJ_LINUX)
-	$(CC) $(INCLUDE) $(OBJ_LINUX) $(LINK) -o $(BINDIR)/$(BINARY)
+	@echo "Linking $@..."
+	@$(CC) $(INCLUDE) $(OBJ_LINUX) $(LINK) -o $(BINDIR)/$(BINARY)
 clean:
 	@rm -f $(BINDIR)/$(BINARY) $(OBJ_LINUX)
 
