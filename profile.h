@@ -21,6 +21,23 @@
 
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdio.h>
+
+#ifdef _PROFILE_
+#define PROFILE_SETUP(name, len) static Profile name(len)
+#define PROFILE_UPDATE(name) do { name.update(); } while(0)
+#define PROFILE_MIN(name) name.min()
+#define PROFILE_MAX(name) name.max()
+#define PROFILE_MEAN(name) name.mean()
+#define PROFILE_PRINT(name) do { printf("Profile %s - min: %llu  max: %llu  mean: %llu\n", #name, name.min(), name.max(), name.mean()); } while(0)
+#else
+#define PROFILE_SETUP(name, len)
+#define PROFILE_UPDATE(name)
+#define PROFILE_PRINT(name)
+#define PROFILE_MIN(name)
+#define PROFILE_MAX(name)
+#define PROFILE_MEAN(name)
+#endif
 
 inline uint64_t _rdtsc() {
 	uint64_t tmp;
