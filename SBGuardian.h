@@ -25,6 +25,7 @@
 #include "IPlayerManager.h"
 #include "IModule.h"
 #include "stdlib.h"
+#include "Vector.h"
 #include "modules/AntiWallhack/AntiWallhack.h"
 #include "modules/AntiFlashhack/AntiFlashhack.h"
 #include "modules/FOVCheck/FOVCheck.h"
@@ -48,12 +49,11 @@ private:
 	CAntiAimbot *m_pAb;
 	CWarmodus *m_pWm;
 	// CAntiSpeedhack *m_pSh;
-
-	IModule *m_void; // always NULL
+	vector<IModule*> m_vecModule;
 
 public:
 	CSBGuardian() : m_pPlayerManager(NULL), m_pEngine(NULL), m_bLoaded(false), m_pWh(NULL),
-	m_pFlash(NULL), m_pFov(NULL), m_pCvar(NULL), m_pUpdate(NULL), m_pAb(NULL), m_pWm(NULL), m_void(NULL)/*,
+	m_pFlash(NULL), m_pFov(NULL), m_pCvar(NULL), m_pUpdate(NULL), m_pAb(NULL), m_pWm(NULL)/*,
 	m_pSh(NULL)*/ { }
 	bool load(IPlayerManager *pPlayerManager, IEngine *pEngine);
 	void unload();

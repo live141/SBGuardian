@@ -24,7 +24,6 @@
 CSBGuardian g_SBG;
 
 bool CSBGuardian::load(IPlayerManager *pPlayerManager, IEngine *pEngine) {
-	m_void = NULL;
 	m_pPlayerManager = pPlayerManager;
 	m_pEngine = pEngine;
 
@@ -32,12 +31,26 @@ bool CSBGuardian::load(IPlayerManager *pPlayerManager, IEngine *pEngine) {
 	m_pFlash = new CAntiFlashhack();
 	m_pFov = new CFOVCheck();
 	m_pCvar = new CCvarCheck();
-	m_pUpdate = new CUpdateSystem();
+	//m_pUpdate = new CUpdateSystem();
 	m_pAb = new CAntiAimbot();
 	m_pWm = new CWarmodus((IModule **) &m_pWh);
 	// m_pSh = new CAntiSpeedhack();
 
+	m_vecModule.push_back(m_pWh);
+	m_vecModule.push_back(m_pFlash);
+	m_vecModule.push_back(m_pFov);
+	m_vecModule.push_back(m_pCvar);
+	m_vecModule.push_back(m_pAb);
+	m_vecModule.push_back(m_pWm);
+	//m_vecModule.push_back(m_pUpdate);
+	//m_vecModule.push_back(m_pSh);
+
 	// init all modules
+
+	for(vector<IModule*>::iterator it = m_vecModule.begin(); it < m_vecModule.end(); ++it) {
+		(*it)->init(pEngine, pPlayerManager);
+	}
+
 	/*
 	IModule **pModule = (IModule **) &m_pWh;
 	while( *pModule != NULL ) {
@@ -70,6 +83,10 @@ void CSBGuardian::unload() {
 		pModule++;
 	}
 	*/
+	for(vector<IModule*>::iterator it = m_vecModule.begin(); it < m_vecModule.end(); ++it) {
+		delete it;
+	}
+	m_vecModule.clear();
 	delete m_pWh;
 	m_pWh = NULL;
 	delete m_pFlash;
@@ -82,17 +99,18 @@ void CSBGuardian::unload() {
 	m_pAb = NULL;
 	delete m_pWm;
 	m_pWm = NULL;
-
+	//delete m_pUpdate;
+	//m_pUpdate = NULL;
 }
 
 void CSBGuardian::onMapChange() {
-	m_pUpdate->onMapChange();
+	// m_pUpdate->onMapChange();
 }
 
 void CSBGuardian::onFrame() {
 	m_pWh->onFrame();
 	m_pCvar->onFrame();
-	m_pUpdate->onFrame();
+	//m_pUpdate->onFrame();
 	m_pAb->onFrame();
 	m_pWm->onFrame();
 	// m_pSh->onFrame();
@@ -207,19 +225,30 @@ void CSBGuardian::onCommand() {
 	else if( !strcmp(strArg1, "url") )
 		strText = CStr::format("%s\n", URL);
 	else if( !strcmp(strArg1, "status") ) {
+		/*
 		IModule **pModule = (IModule **) &m_pWh;
 		while( *pModule != NULL ) {
 			printf("%s: %s\n", pModule[0]->getName(), (pModule[0]->isEnabled())?"enabled":"disabled");
 			pModule++;
 		}
+		*/
+		for(vector<IModule*>::iterator it = m_vecModule.begin(); it < m_vecModule.end(); ++it) {
+			printf("%s: %s\n", (*it)->getName(), ((*it)->isEnabled())?"enabled":"disabled");
+		}
 		return;
 	}
 	else {
+		/*
 		IModule **pModule = (IModule **) &m_pWh;
 		while( *pModule != NULL ) {
 			if( pModule[0]->onCommand() )
 				return;
 			pModule++;
+		}
+		*/
+		for(vector<IModule*>::iterator it = m_vecModule.begin(); it < m_vecModule.end(); ++it) {
+			if( (*it)->onCommand() )
+				return;
 		}
 
 		goto notFound;
@@ -260,11 +289,18 @@ bool CSBGuardian::onClientCommand(IPlayer *pPlayer) {
 	else if( !strcmp(strArg1, "url") )
 		strText = CStr::format("%s\n", URL);
 	else if( !strcmp(strArg1, "status") ) {
+		/*
 		IModule **pModule = (IModule **) &m_pWh;
 		while( *pModule != NULL ) {
 			strText = CStr::format("%s: %s\n", pModule[0]->getName(), (pModule[0]->isEnabled())?"enabled":"disabled");
 			pPlayer->printToConsole(strText);
 			pModule++;
+		}
+		*/
+		
+		for(vector<IModule*>::iterator it = m_vecModule.begin(); it < m_vecModule.end(); ++it) {
+			strText = CStr::format("%s: %s\n", (*it)->getName(), ((*it)->isEnabled())?"enabled":"disabled");
+			pPlayer->printToConsole(strText);
 		}
 		return true;
 	}
