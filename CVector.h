@@ -65,7 +65,7 @@ public:
 	}
 
 	CVector operator +(const CVector& vec) {
-		float f[4] __attribute__((aligned(4)));
+		float f[4] __attribute__((aligned(16)));
 		asm volatile("movaps (%1), %%xmm0\n\t"
 				"movaps (%2), %%xmm1\n\t"
 				"addps %%xmm1, %%xmm0\n\t"
@@ -78,7 +78,7 @@ public:
 	}
 
 	CVector operator -(const CVector& vec) {
-		float f[4] __attribute__((aligned(4)));
+		float f[4] __attribute__((aligned(16)));
 		asm volatile("movaps (%1), %%xmm0\n\t"
 				"movaps (%2), %%xmm1\n\t"
 				"subps %%xmm1, %%xmm0\n\t"
@@ -92,7 +92,7 @@ public:
 
 	float operator *(const CVector& vec) {
 		/* TODO: Further optimization */
-		float f[4] __attribute__((aligned(4)));
+		float f[4] __attribute__((aligned(16)));
 		asm volatile("movaps (%1), %%xmm0\n\t"
 				"movaps (%2), %%xmm1\n\t"
 				"mulps %%xmm1, %%xmm0\n\t"
@@ -110,7 +110,7 @@ public:
 
 	float len() const {
 		/* TODO: More optimization */
-		float f[4] __attribute__((aligned(4)));
+		float f[4] __attribute__((aligned(16)));
 		asm volatile("movaps (%1), %%xmm0\n\t"
 				"mulps %%xmm0, %%xmm0\n\t"
 				"movaps %%xmm0, %0\n\t"
