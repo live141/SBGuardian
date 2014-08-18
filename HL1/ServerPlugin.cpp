@@ -126,7 +126,13 @@ void CServerPlugin::GameFrame() {
 	RETURN(MRES_IGNORED, g_FunctionTable.pfnStartFrame());
 }
 
+int ClientConnect(edict_s *pent, char const *s1, char const *s2, char *s3) {
+	printf("SBGuardian: Client conenected!\n");
+	RETURN_VALUE(MRES_IGNORED, g_FunctionTable.pfnClientConnect(pent, s1, s2, s3), 0);
+}
+
 void CServerPlugin::ClientPutInServer(edict_t *pent) {
+	printf("SBGuardian: Client putin!\n");
 	g_PlayerManager.onConnect(pent);
 	CPlayer *pPlayer = g_PlayerManager.getPlayer(pent);
 	if( pPlayer != NULL )

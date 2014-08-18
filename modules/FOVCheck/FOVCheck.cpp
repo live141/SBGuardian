@@ -56,8 +56,8 @@ bool CFOVCheck::isInVision(IPlayer *pPlayer, IPlayer *pEnemy) {
 
 	CVector vecEnemyPlayer(pEnemy->getOrigin() - pPlayer->getEyeOrigin());
 	CVector vecAngle(pPlayer->getVecAngle());
-	vecEnemyPlayer.m_fZ = 0.0;
-	vecAngle.m_fZ = 0.0;
+	vecEnemyPlayer.m_f[2] = 0.0;
+	vecAngle.m_f[0] = 0.0;
 	float flLen1 = vecEnemyPlayer.len();
 	float flLen2 = vecAngle.len();
 	if( flLen1 == 0 || flLen2 == 0 )

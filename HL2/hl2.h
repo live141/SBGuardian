@@ -20,7 +20,7 @@
 #define HL2_H_
 
 // #include "CSmmAPI.h"
-#define NULL 0
+//#define NULL 0
 #define GAME_DLL 1
 #include "isaverestore.h"
 #include "ehandle.h"

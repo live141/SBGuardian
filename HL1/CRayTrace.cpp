@@ -27,8 +27,6 @@
 
 bool CRayTrace::traceWall(CVector& vecSrc, CVector& vecDest, IPlayer *pIgnore, vector<IPlayer *>& conHitHead, vector<IPlayer *>& conHitEnemy) {
 	PROFILE_SETUP(RAYTRACE, 300);
-	PROFILE_UPDATE(RAYTRACE);
-	PROFILE_PRINT(RAYTRACE);
 
 	CVector vecDirection = vecDest - vecSrc;
 	vecDirection.normalize();
@@ -39,7 +37,7 @@ bool CRayTrace::traceWall(CVector& vecSrc, CVector& vecDest, IPlayer *pIgnore, v
 	m_pIgnore = (CPlayer *) pIgnore;
 	TraceResult tr;
 	CPlayer *pPlayer = (CPlayer *) pIgnore;
-	g_EngFuncs.pfnTraceLine(&vecSrc.m_fX, &vecDest.m_fX, 1, (edict_t *) pPlayer->getEdict(), &tr);
+	g_EngFuncs.pfnTraceLine(&vecSrc.m_f[0], &vecDest.m_f[0], 1, (edict_t *) pPlayer->getEdict(), &tr);
 	m_flFraction = tr.flFraction;
 	m_pHit = tr.pHit;
 	m_vecEnd.set((float *) &tr.vecEndPos.x);
@@ -50,22 +48,26 @@ bool CRayTrace::traceWall(CVector& vecSrc, CVector& vecDest, IPlayer *pIgnore, v
 	else
 		m_bHitHead = false;
 
-	if( m_flFraction < 1.0 && hitWorld() )
+	if( m_flFraction < 1.0 && hitWorld() ) {
+		PROFILE_UPDATE(RAYTRACE);
+		PROFILE_PRINT(RAYTRACE);
 		return true;
-	else
+	}
+	else {
+		PROFILE_UPDATE(RAYTRACE);
+		PROFILE_PRINT(RAYTRACE);
 		return false;
+	}
 }
 
 bool CRayTrace::_traceWall(CVector& vecSrc, CVector& vecDest, edict_t *pIgnore) {
 	PROFILE_SETUP(RAYTRACE, 300);
-	PROFILE_UPDATE(RAYTRACE);
-	PROFILE_PRINT(RAYTRACE);
 
 	if( m_iTraces == MAX_TRACES )
 		return true;
 	m_iTraces++;
 	TraceResult tr;
-	g_EngFuncs.pfnTraceLine(&vecSrc.m_fX, &vecDest.m_fY, 1, pIgnore, &tr);
+	g_EngFuncs.pfnTraceLine(&vecSrc.m_f[0], &vecDest.m_f[0], 1, pIgnore, &tr);
 	m_flFraction = tr.flFraction;
 	m_pHit = tr.pHit;
 	m_vecEnd.set((float *) &tr.vecEndPos.x);
@@ -75,10 +77,16 @@ bool CRayTrace::_traceWall(CVector& vecSrc, CVector& vecDest, edict_t *pIgnore) 
 	else
 		m_bHitHead = false;
 
-	if( m_flFraction < 1.0 && hitWorld() )
+	if( m_flFraction < 1.0 && hitWorld() ) {
+		PROFILE_UPDATE(RAYTRACE);
+		PROFILE_PRINT(RAYTRACE);
 		return true;
-	else
+	}
+	else {
+		PROFILE_UPDATE(RAYTRACE);
+		PROFILE_PRINT(RAYTRACE);
 		return false;
+	}
 }
 
 bool CRayTrace::hitWorld() {

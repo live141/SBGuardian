@@ -54,11 +54,14 @@ OBJECTS += \
 	
 	
 ifeq "$(DEBUG)" "true"
-	CFLAGS += -g3
+	CFLAGS += -g3 -D_PROFILE_
+	LINK += -g3
 endif
 
 ifeq "$(PROFILE)" "true"
-	CFLAGS += -pg
+	#CFLAGS += -pg
+	#LINK += -pg
+	CFLAGS += -D_PROFILE_
 endif
 
 GCC_VERSION := $(shell $(CC) -dumpversion >&1 | cut -b1)
@@ -79,7 +82,7 @@ INCLUDE = \
 	-I$(MM) \
 	-I$(MMSOURCE)/sourcehook
 
-LINK = -m32 -lm -ldl -fPIC -fno-exceptions -fno-rtti -static-libgcc -Wno-non-virtual-dtor -shared #$(shell $(CC) -print-file-name=libstdc++.a)
+LINK += -m32 -lm -ldl -fPIC -fno-exceptions -fno-rtti -static-libgcc -Wno-non-virtual-dtor -shared #$(shell $(CC) -print-file-name=libstdc++.a)
 
 ####################################################################################################### 
 OBJ_LINUX := $(OBJECTS:%.cpp=$(BINDIR)/%.o)

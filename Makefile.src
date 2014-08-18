@@ -50,11 +50,12 @@ OBJECTS += \
 	sourcehook_impl_cvfnptr.cpp
 
 ifeq "$(DEBUG)" "true"
-	CFLAGS += -g3
+	CFLAGS += -g3 -D_DEBUG_
 endif
 
 ifeq "$(PROFILE)" "true"
-	CFLAGS += -pg
+	#CFLAGS += -pg
+	CFLAGS += -D_PROFILE_
 endif
 
 LINK = $(shell $(CC) -print-file-name=libstdc++.a) -m32 -lm -ldl -fPIC -fno-exceptions -fno-rtti -static-libgcc -Wno-non-virtual-dtor -shared \

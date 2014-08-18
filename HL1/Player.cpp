@@ -114,7 +114,7 @@ CVector& CPlayer::getEyeOrigin() {
 }
 
 CVector& CPlayer::getVecAngle() {
-	g_EngFuncs.pfnAngleVectors(&(m_pEnt->v.v_angle.x), &m_vecAngle.m_fX, NULL, NULL);
+	g_EngFuncs.pfnAngleVectors(&(m_pEnt->v.v_angle.x), &m_vecAngle.m_f[0], NULL, NULL);
 	return m_vecAngle;
 }
 

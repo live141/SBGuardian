@@ -241,7 +241,7 @@ DLL_FUNCTIONS FunctionTable =
 	NULL,					// pfnSaveGlobalState
 	NULL,					// pfnRestoreGlobalState
 	NULL,					// pfnResetGlobalState
-	NULL, // ah_ClientConnect2,		// pfnClientConnect
+	NULL,					// pfnClientConnect
 	CServerPlugin::ClientDisconnect,	// pfnClientDisconnect
 	NULL,					// pfnClientKill
 	CServerPlugin::ClientPutInServer,		// pfnClientPutInServer

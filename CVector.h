@@ -24,80 +24,109 @@
 class CVector {
 	friend CVector operator *(float fNum, CVector& vec);
 public:
-	float m_fX, m_fY, m_fZ;
+	//float m_f[0], m_f[1], m_f[2];
+	float m_f[4] __attribute__((aligned(4)));
 
 public:
-	CVector() : m_fX(0.0), m_fY(0.0), m_fZ(0.0) { }
-	CVector(float x, float y, float z) : m_fX(x), m_fY(y), m_fZ(z) { }
-	CVector(float *flCoords) : m_fX(flCoords[0]), m_fY(flCoords[1]), m_fZ(flCoords[2]) { }
+	CVector() { m_f[0] = 0.0; m_f[1] = 0.0; m_f[2] = 0.0; }
+	CVector(float x, float y, float z) { m_f[0] = x; m_f[1] = y; m_f[2] = z; }
+	CVector(float *flCoords) { m_f[0] = flCoords[0]; m_f[1] = flCoords[1]; m_f[2] = flCoords[2]; }
 	CVector(const CVector& vec) {
-		m_fX = vec.m_fX;
-		m_fY = vec.m_fY;
-		m_fZ = vec.m_fZ;
+		m_f[0] = vec.m_f[0];
+		m_f[1] = vec.m_f[1];
+		m_f[2] = vec.m_f[2];
 	}
 
 	void set(float *flCoords) {
-		m_fX = flCoords[0];
-		m_fY = flCoords[1];
-		m_fZ = flCoords[2];
+		m_f[0] = flCoords[0];
+		m_f[1] = flCoords[1];
+		m_f[2] = flCoords[2];
 	}
 
 	void set(float x, float y, float z) {
-		m_fX = x;
-		m_fY = y;
-		m_fZ = z;
+		m_f[0] = x;
+		m_f[1] = y;
+		m_f[2] = z;
 	}
 
 	bool operator ==(const CVector& vec) const {
-		return ( m_fX == vec.m_fX && m_fY == vec.m_fY && m_fZ == vec.m_fZ );
+		return ( m_f[0] == vec.m_f[0] && m_f[1] == vec.m_f[1] && m_f[2] == vec.m_f[2] );
 	}
 
 	bool operator !=(const CVector& vec) const {
-		return ( m_fX != vec.m_fX || m_fY != vec.m_fY || m_fZ != vec.m_fZ );
+		return ( m_f[0] != vec.m_f[0] || m_f[1] != vec.m_f[1] || m_f[2] != vec.m_f[2] );
 	}
-
-	/*
-	CVector operator =(CVector& vec) {
-		m_fX = vec.m_fX;
-		m_fY = vec.m_fY;
-		m_fZ = vec.m_fZ;
-		return *this;
-	}
-*/
 
 	CVector operator =(const CVector& vec) {
-		m_fX = vec.m_fX;
-		m_fY = vec.m_fY;
-		m_fZ = vec.m_fZ;
+		m_f[0] = vec.m_f[0];
+		m_f[1] = vec.m_f[1];
+		m_f[2] = vec.m_f[2];
 		return *this;
 	}
 
 	CVector operator +(const CVector& vec) {
-		return CVector(m_fX+vec.m_fX, m_fY+vec.m_fY, m_fZ+vec.m_fZ);
+		float f[4] __attribute__((aligned(4)));
+		asm volatile("movaps (%1), %%xmm0\n\t"
+				"movaps (%2), %%xmm1\n\t"
+				"addps %%xmm1, %%xmm0\n\t"
+				"movaps %%xmm0, %0\n\t"
+				: "=m"(f)
+				: "r"(m_f), "r"(vec.m_f)
+				: );
+		return CVector(f);
+		//return CVector(m_f[0]+vec.m_f[0], m_f[1]+vec.m_f[1], m_f[2]+vec.m_f[2]);
 	}
 
 	CVector operator -(const CVector& vec) {
-		return CVector(m_fX-vec.m_fX, m_fY-vec.m_fY, m_fZ-vec.m_fZ);
+		float f[4] __attribute__((aligned(4)));
+		asm volatile("movaps (%1), %%xmm0\n\t"
+				"movaps (%2), %%xmm1\n\t"
+				"subps %%xmm1, %%xmm0\n\t"
+				"movaps %%xmm0, %0\n\t"
+				: "=m"(f)
+				: "r"(m_f), "r"(vec.m_f)
+				: );
+		return CVector(f);
+		//return CVector(m_f[0]-vec.m_f[0], m_f[1]-vec.m_f[1], m_f[2]-vec.m_f[2]);
 	}
 
 	float operator *(const CVector& vec) {
-		return m_fX*vec.m_fX + m_fY*vec.m_fY + m_fZ*vec.m_fZ;
+		/* TODO: Further optimization */
+		float f[4] __attribute__((aligned(4)));
+		asm volatile("movaps (%1), %%xmm0\n\t"
+				"movaps (%2), %%xmm1\n\t"
+				"mulps %%xmm1, %%xmm0\n\t"
+				"movaps %%xmm0, %0\n\t"
+				: "=m"(f)
+				: "r"(m_f), "r"(vec.m_f)
+				: );
+		return f[0]+f[1]+f[2];
+		//return m_f[0]*vec.m_f[0] + m_f[1]*vec.m_f[1] + m_f[2]*vec.m_f[2];
 	}
 
 	CVector operator *(float fNum) {
-		return CVector(fNum*m_fX, fNum*m_fY, fNum*m_fZ);
+		return CVector(fNum*m_f[0], fNum*m_f[1], fNum*m_f[2]);
 	}
 
 	float len() const {
-		return sqrt(m_fX*m_fX + m_fY*m_fY + m_fZ*m_fZ);
+		/* TODO: More optimization */
+		float f[4] __attribute__((aligned(4)));
+		asm volatile("movaps (%1), %%xmm0\n\t"
+				"mulps %%xmm0, %%xmm0\n\t"
+				"movaps %%xmm0, %0\n\t"
+				: "=m"(f)
+				: "r"(m_f)
+				: );
+		return sqrt(f[0]+f[1]+f[2]);
+		//return sqrt(m_f[0]*m_f[0] + m_f[1]*m_f[1] + m_f[2]*m_f[2]);
 	}
 
 	CVector& normalize() {
 		float fLen = len();
 		if( fLen != 0.0 ) {
-			m_fX /= fLen;
-			m_fY /= fLen;
-			m_fZ /= fLen;
+			m_f[0] /= fLen;
+			m_f[1] /= fLen;
+			m_f[2] /= fLen;
 		}
 
 		return *this;

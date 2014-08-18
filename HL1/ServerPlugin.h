@@ -57,6 +57,7 @@ public:
 
 	static void hookCmdDummy();
 	static void GameFrame();
+	static int ClientConnect(edict_s *pent, char const *s1, char const *s2, char *s3);
 	static void ClientPutInServer(edict_t *pent);
 	static void ClientDisconnect(edict_t *pent);
 	static void ClientCommand(edict_t *pent);

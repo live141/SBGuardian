@@ -95,8 +95,6 @@ bool CAntiWallhack::isVisible(IPlayer *pPlayer, IPlayer *pEnemy) {
 		return true;
 
 	PROFILE_SETUP(isVisible, 400);
-	PROFILE_UPDATE(isVisible);
-	PROFILE_PRINT(isVisible);
 
 	if( m_Cache.isSeeable(pPlayer, pEnemy) )
 		return true;
@@ -117,7 +115,7 @@ bool CAntiWallhack::isVisible(IPlayer *pPlayer, IPlayer *pEnemy) {
 	CVector targetMins = pEnemy->getMins() + pEnemy->getOrigin();
 
 	CVector Origin_PolOrigin(vecIntOrigin - CVector(pEnemy->getOrigin()));
-	CVector MaxLen(pEnemy->getMaxs().m_fX, pEnemy->getMaxs().m_fY, 0);
+	CVector MaxLen(pEnemy->getMaxs().m_f[0], pEnemy->getMaxs().m_f[1], 0);
 	CVector IntPol, IntPol2, IntPol3, IntPol4;
 	float flPolOriginLen = Origin_PolOrigin.len();
 
@@ -125,13 +123,13 @@ bool CAntiWallhack::isVisible(IPlayer *pPlayer, IPlayer *pEnemy) {
 		{
 			IntPol = Origin_PolOrigin * (1.0 + MaxLen.len()/flPolOriginLen);
 			IntPol3 = IntPol + CVector(pEnemy->getEyeOrigin());
-			IntPol = IntPol + CVector(pEnemy->getOrigin()) + CVector(0, 0, pEnemy->getMins().m_fZ);
+			IntPol = IntPol + CVector(pEnemy->getOrigin()) + CVector(0, 0, pEnemy->getMins().m_f[2]);
 
 			IntPol2 = Origin_PolOrigin * (-1);
 			IntPol2.normalize();
 			IntPol2 = IntPol2 * MaxLen.len();
 			IntPol4 = IntPol2 + CVector(pEnemy->getEyeOrigin());
-			IntPol2 = IntPol2 + CVector(pEnemy->getOrigin()) + CVector(0, 0, pEnemy->getMins().m_fZ);
+			IntPol2 = IntPol2 + CVector(pEnemy->getOrigin()) + CVector(0, 0, pEnemy->getMins().m_f[2]);
 
 			vecPlayers.clear();
 			vecEnemies.clear();
@@ -141,6 +139,8 @@ bool CAntiWallhack::isVisible(IPlayer *pPlayer, IPlayer *pEnemy) {
 				// add player only here to avoid problems with the cache
 				vecPlayers.push_back(pPlayer);
 				m_Cache.proceed(vecPlayers, vecEnemies, 0);
+				PROFILE_UPDATE(isVisible);
+				PROFILE_PRINT(isVisible);
 				return true;
 			}
 			else {
@@ -154,6 +154,8 @@ bool CAntiWallhack::isVisible(IPlayer *pPlayer, IPlayer *pEnemy) {
 			{
 				vecPlayers.push_back(pPlayer);
 				m_Cache.proceed(vecPlayers, vecEnemies, 0);
+				PROFILE_UPDATE(isVisible);
+				PROFILE_PRINT(isVisible);
 				return true;
 			}
 			else {
@@ -167,6 +169,8 @@ bool CAntiWallhack::isVisible(IPlayer *pPlayer, IPlayer *pEnemy) {
 			{
 				vecPlayers.push_back(pPlayer);
 				m_Cache.proceed(vecPlayers, vecEnemies, 0);
+				PROFILE_UPDATE(isVisible);
+				PROFILE_PRINT(isVisible);
 				return true;
 			}
 			else {
@@ -180,6 +184,8 @@ bool CAntiWallhack::isVisible(IPlayer *pPlayer, IPlayer *pEnemy) {
 			{
 				vecPlayers.push_back(pPlayer);
 				m_Cache.proceed(vecPlayers, vecEnemies, 0);
+				PROFILE_UPDATE(isVisible);
+				PROFILE_PRINT(isVisible);
 				return true;
 			}
 			else {
@@ -192,9 +198,9 @@ bool CAntiWallhack::isVisible(IPlayer *pPlayer, IPlayer *pEnemy) {
 			for(int i = 0; i < 8; i++)
 			{
 				float m_flOut_NotInt[3];
-				m_flOut_NotInt[0] = (i & 1) ? targetMins.m_fX : targetMaxs.m_fX;
-				m_flOut_NotInt[1] = (i & 2) ? targetMins.m_fY : targetMaxs.m_fY;
-				m_flOut_NotInt[2] = (i & 4) ? targetMins.m_fZ : targetMaxs.m_fZ;
+				m_flOut_NotInt[0] = (i & 1) ? targetMins.m_f[0] : targetMaxs.m_f[0];
+				m_flOut_NotInt[1] = (i & 2) ? targetMins.m_f[1] : targetMaxs.m_f[1];
+				m_flOut_NotInt[2] = (i & 4) ? targetMins.m_f[2] : targetMaxs.m_f[2];
 
 				vecPlayers.clear();
 				vecEnemies.clear();
@@ -204,6 +210,8 @@ bool CAntiWallhack::isVisible(IPlayer *pPlayer, IPlayer *pEnemy) {
 				{
 					vecPlayers.push_back(pPlayer);
 					m_Cache.proceed(vecPlayers, vecEnemies, 0);
+					PROFILE_UPDATE(isVisible);
+					PROFILE_PRINT(isVisible);
 					return true;
 				}
 				else {
@@ -219,6 +227,8 @@ bool CAntiWallhack::isVisible(IPlayer *pPlayer, IPlayer *pEnemy) {
 		{
 			vecPlayers.push_back(pPlayer);
 			m_Cache.proceed(vecPlayers, vecEnemies, 0);
+			PROFILE_UPDATE(isVisible);
+			PROFILE_PRINT(isVisible);
 			return true;
 		}
 		else {
@@ -230,6 +240,8 @@ bool CAntiWallhack::isVisible(IPlayer *pPlayer, IPlayer *pEnemy) {
 
 	// check if players are behind the one that is behind a wall and put them into cache
 
+	PROFILE_UPDATE(isVisible);
+	PROFILE_PRINT(isVisible);
 	return false;
 }
 

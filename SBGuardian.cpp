@@ -20,6 +20,7 @@
 #include "Arg.h"
 #include "CStr.h"
 #include "version.h"
+#include "profile.h"
 
 CSBGuardian g_SBG;
 
@@ -85,6 +86,7 @@ void CSBGuardian::onFrame() {
 	m_pWm->onFrame();
 	// m_pSh->onFrame();
 	return;
+
 	/* InitLate, loaded after config.cfg got executed */
 	static bool bInited = false;
 	if(!bInited) {
@@ -115,7 +117,6 @@ void CSBGuardian::onCvarValue(IPlayer *pPlayer, const char *strName, const char 
 }
 
 bool CSBGuardian::onCheckTransmit(IPlayer *pPlayer, IPlayer *pEnt) {
-	// printf("%x %x\n", pPlayer, pEnt);
 	if(pEnt == NULL || pPlayer == NULL)
 		return true;
 
@@ -124,12 +125,17 @@ bool CSBGuardian::onCheckTransmit(IPlayer *pPlayer, IPlayer *pEnt) {
 
 	if(!pPlayer->isInGame() || !pEnt->isInGame())
 		return true;
+#ifndef _PROFILE_
 	if(pPlayer->isBot())
 		return false;
+	if(pEnt->isBot())
+		return true;
+#endif
 
-	if(pPlayer->isSpec() || pPlayer->isHLTV() || pEnt->isBot() || pEnt->isSpec())
+	if(pPlayer->isSpec() || pPlayer->isHLTV() || pEnt->isSpec())
 		return true;
 
+	/* Deathcam is tricky! */
 	if(pPlayer->isDying())
 		return true;
 
@@ -179,54 +185,33 @@ bool CSBGuardian::onCheckTransmit(IPlayer *pPlayer, IPlayer *pEnt) {
 
 void CSBGuardian::onCommand() {
 	const char *strArg1 = m_pEngine->argv(1);
-	const char *strText = NULL;
 
 	if( m_pEngine->argc() < 2 || strArg1 == NULL ) {
 		notFound:
-		strText = CStr::format("Commands:\nversion\nauthor\nurl\nstatus\n");
-		printf("%s", strText);
+		printf("Commands:\nversion\nauthor\nurl\nstatus\n");
 		return;
 	}
 
 	if( !strcmp(strArg1, "author") )
-		strText = CStr::format("%s\n", AUTHOR);
+		printf("%s\n", AUTHOR);
 	else if( !strcmp(strArg1, "version") )
-		strText = CStr::format("version %s (rev%d)\ncompiled %s, %s\n", VERSION, REV, __DATE__, __TIME__);
+		printf("version %s (rev%d)\ncompiled %s, %s\n", VERSION, REV, __DATE__, __TIME__);
 	else if( !strcmp(strArg1, "url") )
-		strText = CStr::format("%s\n", URL);
+		printf("%s\n", URL);
 	else if( !strcmp(strArg1, "status") ) {
-		/*
-		IModule **pModule = (IModule **) &m_pWh;
-		while( *pModule != NULL ) {
-			printf("%s: %s\n", pModule[0]->getName(), (pModule[0]->isEnabled())?"enabled":"disabled");
-			pModule++;
-		}
-		*/
+		printf("Module\t\tstatus\n");
 		for(vector<IModule*>::iterator it = m_vecModule.begin(); it < m_vecModule.end(); ++it) {
-			printf("%s: %s\n", (*it)->getName(), ((*it)->isEnabled())?"enabled":"disabled");
+			printf("%s:\t\t%s\n", (*it)->getName(), ((*it)->isEnabled())?"enabled":"disabled");
 		}
 		return;
 	}
 	else {
-		/*
-		IModule **pModule = (IModule **) &m_pWh;
-		while( *pModule != NULL ) {
-			if( pModule[0]->onCommand() )
-				return;
-			pModule++;
-		}
-		*/
 		for(vector<IModule*>::iterator it = m_vecModule.begin(); it < m_vecModule.end(); ++it) {
 			if( (*it)->onCommand() )
 				return;
 		}
 
 		goto notFound;
-	}
-
-	if( strText != NULL ) {
-		printf("%s", strText);
-		return;
 	}
 }
 
@@ -259,17 +244,10 @@ bool CSBGuardian::onClientCommand(IPlayer *pPlayer) {
 	else if( !strcmp(strArg1, "url") )
 		strText = CStr::format("%s\n", URL);
 	else if( !strcmp(strArg1, "status") ) {
-		/*
-		IModule **pModule = (IModule **) &m_pWh;
-		while( *pModule != NULL ) {
-			strText = CStr::format("%s: %s\n", pModule[0]->getName(), (pModule[0]->isEnabled())?"enabled":"disabled");
-			pPlayer->printToConsole(strText);
-			pModule++;
-		}
-		*/
-		
+		strText = CStr::format("Module\t\tstatus\n");
+		pPlayer->printToConsole(strText);
 		for(vector<IModule*>::iterator it = m_vecModule.begin(); it < m_vecModule.end(); ++it) {
-			strText = CStr::format("%s: %s\n", (*it)->getName(), ((*it)->isEnabled())?"enabled":"disabled");
+			strText = CStr::format("%s:\t\t%s\n", (*it)->getName(), ((*it)->isEnabled())?"enabled":"disabled");
 			pPlayer->printToConsole(strText);
 		}
 		return true;
@@ -287,7 +265,6 @@ bool CSBGuardian::onClientCommand(IPlayer *pPlayer) {
 }
 
 void CSBGuardian::onPlayerFlash(IPlayer *pPlayer, float flTime) {
-	// printf("onflash: %s %f\n", pPlayer->getNick(), flTime);
 	m_pFlash->onFlash(pPlayer, flTime);
 }
 
