@@ -16,6 +16,9 @@
 * along with this program. If not, see <http://www.gnu.org/licenses/>.
 **/
 
+#if SOURCE_ENGINE >= SE_CSGO
+#include "google/protobuf/message.h"
+#endif
 #include "ServerPlugin.h"
 #include "../version.h"
 #include "PlayerManager.h"
@@ -60,9 +63,13 @@ SH_DECL_HOOK1_void(ConCommand, Dispatch, SH_NOATTRIB, 0, const CCommand &);
 SH_DECL_HOOK5_void(IServerPluginCallbacks, OnQueryCvarValueFinished, SH_NOATTRIB, 0, QueryCvarCookie_t , edict_t *, EQueryCvarValueStatus , const char *, const char *);
 // SH_DECL_HOOK2_void(IGameMovement, ProcessMovement, SH_NOATTRIB, 0, CBasePlayer *, CMoveData *);
 SH_DECL_HOOK3_void(CBasePlayer, TraceAttack, SH_NOATTRIB, 0, const CTakeDamageInfo &, const Vector&, trace_t *);
+#if SOURCE_ENGINE >= SE_CSGO
+SH_DECL_HOOK3_void(IVEngineServer, SendUserMessage, SH_NOATTRIB, 0, IRecipientFilter&, int, const google::protobuf::Message&);
+#else
 SH_DECL_HOOK2(IVEngineServer, UserMessageBegin, SH_NOATTRIB, 0, bf_write *, IRecipientFilter *, int);
+#endif
 SH_DECL_HOOK0_void(IVEngineServer, MessageEnd, SH_NOATTRIB, 0);
-SH_DECL_HOOK15_void(IEngineSound, EmitSound, SH_NOATTRIB, 0, IRecipientFilter&, int, int, const char *, float, soundlevel_t, int, int, int, const Vector*, const Vector*, CUtlVector< Vector >*, bool, float, int);
+//SH_DECL_HOOK15_void(IEngineSound, EmitSound, SH_NOATTRIB, 0, IRecipientFilter&, int, int, const char *, float, soundlevel_t, int, int, int, const Vector*, const Vector*, CUtlVector< Vector >*, bool, float, int);
 //SH_DECL_HOOK15_void(IEngineSound, EmitSound, SH_NOATTRIB, 1, IRecipientFilter&, int, int, const char *, float, soundlevel_t, int, int, int, const Vector*, const Vector*, CUtlVector< Vector >*, bool, float, int);
 /********************************************************************************************************/
 
@@ -207,10 +214,14 @@ void CServerPlugin::loadHooks() {
 	SH_ADD_HOOK(IServerGameDLL, GameFrame, g_pServer, &CServerPlugin::onFrame, false);
 	SH_ADD_HOOK(IServerGameDLL, ServerActivate, g_pServer, &CServerPlugin::onServerActivate, false);
 	// SH_ADD_HOOK(IGameMovement, ProcessMovement, g_pGameMovement, &CServerPlugin::onProcessMove, false);
+#if SOURCE_ENGINE >= SE_CSGO
+	SH_ADD_HOOK(IVEngineServer, SendUserMessage, g_pEngine, &CServerPlugin::onSendUserMessage, false);
+#else
 	SH_ADD_HOOK(IVEngineServer, UserMessageBegin, g_pEngine, &CServerPlugin::onUserMessageBegin, false);
+#endif
 	SH_ADD_HOOK(IVEngineServer, MessageEnd, g_pEngine, &CServerPlugin::onMessageEnd, false);
 	//SH_ADD_HOOK(IEngineSound, EmitSound, g_pEngineSound, &CServerPlugin::onEmitSound, false);
-	SH_ADD_HOOK(IEngineSound, EmitSound, g_pEngineSound, &CServerPlugin::onEmitSound2, false);
+	//SH_ADD_HOOK(IEngineSound, EmitSound, g_pEngineSound, &CServerPlugin::onEmitSound2, false);
 	loadHooksVSP();
 }
 
@@ -229,10 +240,14 @@ void CServerPlugin::unloadHooks() {
 	SH_REMOVE_HOOK(IServerGameDLL, GameFrame, g_pServer, &CServerPlugin::onFrame, false);
 	SH_REMOVE_HOOK(IServerGameDLL, ServerActivate, g_pServer, &CServerPlugin::onServerActivate, false);
 	// SH_REMOVE_HOOK(IGameMovement, ProcessMovement, g_pGameMovement, &CServerPlugin::onProcessMove, false);
+#if SOURCE_ENGINE >= SE_CSGO
+	SH_REMOVE_HOOK(IVEngineServer, SendUserMessage, g_pEngine, &CServerPlugin::onSendUserMessage, false);
+#else
 	SH_REMOVE_HOOK(IVEngineServer, UserMessageBegin, g_pEngine, &CServerPlugin::onUserMessageBegin, false);
+#endif
 	SH_REMOVE_HOOK(IVEngineServer, MessageEnd, g_pEngine, &CServerPlugin::onMessageEnd, false);
 	//SH_REMOVE_HOOK(IEngineSound, EmitSound, g_pEngineSound, &CServerPlugin::onEmitSound, false);
-	SH_REMOVE_HOOK(IEngineSound, EmitSound, g_pEngineSound, &CServerPlugin::onEmitSound2, false);
+	//SH_REMOVE_HOOK(IEngineSound, EmitSound, g_pEngineSound, &CServerPlugin::onEmitSound2, false);
 }
 
 void CServerPlugin::unloadHooksVSP() {
@@ -285,7 +300,7 @@ void CServerPlugin::init(bool bLate) {
 	int msg = 0;
 	char msgbuf[64];
 	int size;
-
+#if SOURCE_ENGINE < SE_CSGO
 	while( g_pServer->GetUserMessageInfo(msg, msgbuf, sizeof(msgbuf), size) ) {
 		// printf("%d %s\n", msg, msgbuf);
 		if( strcmp("ShowMenu", msgbuf) == 0 ) {
@@ -298,7 +313,10 @@ void CServerPlugin::init(bool bLate) {
 			m_iMsgFade = msg;
 		msg++;
 	}
-
+#else
+	g_Engine.m_iMsgMenu = DIALOG_MENU;
+	g_Engine.m_iMsgText = DIALOG_TEXT;
+#endif
 	printf("MsgText: %d\n", g_Engine.m_iMsgText);
 	printf("MsgMenu: %d\n", g_Engine.m_iMsgMenu);
 	printf("MsgMenu: %d\n", m_iMsgFade);
@@ -511,6 +529,23 @@ void CServerPlugin::ConCommand_Dispatch(const CCommand &command) {
 	RETURN_META(MRES_IGNORED);
 }
 
+#ifdef SOURCE_ENGINE >= SE_CSGO
+void CServerPlugin::onSendUserMessage( IRecipientFilter &filter, int message, const google::protobuf::Message &msg ) {
+	/*g_ServerPlugin.m_pMsgWriter =*/ SH_CALL(g_pEngine, &IVEngineServer::SendUserMessage)(filter, message, msg);
+	g_ServerPlugin.m_iLastMsg = message;
+	
+	// get all recipients
+	char cNum = filter.GetRecipientCount();
+	g_ServerPlugin.m_cNumRecipients = cNum;
+	g_ServerPlugin.m_aRecipient = new IPlayer*[cNum];
+	for(short i = 0; i < cNum; i++ ) {
+		g_ServerPlugin.m_aRecipient[i] = g_PlayerManager.getPlayer(filter.GetRecipientIndex(i));
+	}
+
+	RETURN_META(MRES_SUPERCEDE);
+}
+#else
+
 bf_write *CServerPlugin::onUserMessageBegin( IRecipientFilter *filter, int msg_type ) {
 	g_ServerPlugin.m_pMsgWriter = SH_CALL(g_pEngine, &IVEngineServer::UserMessageBegin)(filter, msg_type);
 	g_ServerPlugin.m_iLastMsg = msg_type;
@@ -525,6 +560,7 @@ bf_write *CServerPlugin::onUserMessageBegin( IRecipientFilter *filter, int msg_t
 
 	RETURN_META_VALUE(MRES_SUPERCEDE, g_ServerPlugin.m_pMsgWriter);
 }
+#endif
 
 void CServerPlugin::onMessageEnd( void ) {
 	// process msgdata here

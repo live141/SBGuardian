@@ -77,7 +77,9 @@ const char *CEngine::argv(int iIndex) const {
 void CEngine::printHud(const char *strText) const {
 	CRecipientFilter filter;
 	filter.AddAllPlayers();
-#if SOURCE_ENGINE >= SE_LEFT4DEAD
+#if SOURCE_ENGINE >= SE_CSGO
+	bf_write *pWrite = g_pEngine->EntityMessageBegin(&filter, m_iMsgText, "SayText");
+#elif SOURCE_ENGINE >= SE_LEFT4DEAD
 	bf_write *pWrite = g_pEngine->UserMessageBegin(&filter, m_iMsgText, "SayText");
 #else
 	bf_write *pWrite = g_pEngine->UserMessageBegin(&filter, m_iMsgText /* 3 Say_Text */);

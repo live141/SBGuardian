@@ -51,7 +51,7 @@ bool CRayTrace::traceWall(CVector& vecSrc, CVector& vecDest, IPlayer *pIgnore, v
 	m_pIgnore = (CPlayer *) pIgnore;
 	CPlayer *pPlayer = (CPlayer *) pIgnore;
 	Ray_t ray;
-	Vector src(vecSrc.m_fX, vecSrc.m_fY, vecSrc.m_fZ), dest(vecDest.m_fX, vecDest.m_fY, vecDest.m_fZ);
+	Vector src(vecSrc.m_f[0], vecSrc.m_f[1], vecSrc.m_f[2]), dest(vecDest.m_f[0], vecDest.m_f[1], vecDest.m_f[2]);
 	ray.Init(src, dest);
 	trace_t tr;
 	g_CFilterWall.pIgnore = ((CPlayer *) pIgnore)->m_pEnt->GetUnknown()->GetBaseEntity()->GetCollideable()->GetEntityHandle();
@@ -77,7 +77,7 @@ bool CRayTrace::_traceWall(CVector& vecSrc, CVector& vecDest, edict_t *pIgnore) 
 		return true;
 	m_iTraces++;
 	Ray_t ray;
-	Vector src(vecSrc.m_fX, vecSrc.m_fY, vecSrc.m_fZ), dest(vecDest.m_fX, vecDest.m_fY, vecDest.m_fZ);
+	Vector src(vecSrc.m_f[0], vecSrc.m_f[1], vecSrc.m_f[2]), dest(vecDest.m_f[0], vecDest.m_f[1], vecDest.m_f[2]);
 	ray.Init(src, dest);
 	trace_t tr;
 	g_CFilterWall.pIgnore = pIgnore->GetUnknown()->GetBaseEntity()->GetCollideable()->GetEntityHandle();

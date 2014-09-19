@@ -152,27 +152,27 @@ CVector& CPlayer::getVecAngle() {
 }
 
 CVector& CPlayer::getMins() {
-	m_vecMins.m_fX = m_pEnt->GetCollideable()->OBBMins().x * 1.8;
-	m_vecMins.m_fY = m_pEnt->GetCollideable()->OBBMins().y * 1.8;
-	m_vecMins.m_fZ = m_pEnt->GetCollideable()->OBBMins().z;
+	m_vecMins.m_f[0] = m_pEnt->GetCollideable()->OBBMins().x * 1.8;
+	m_vecMins.m_f[1] = m_pEnt->GetCollideable()->OBBMins().y * 1.8;
+	m_vecMins.m_f[2] = m_pEnt->GetCollideable()->OBBMins().z;
 	return m_vecMins;
 }
 
 CVector& CPlayer::getMaxs() {
-	m_vecMaxs.m_fX = m_pEnt->GetCollideable()->OBBMaxs().x * 1.8;
-	m_vecMaxs.m_fY = m_pEnt->GetCollideable()->OBBMaxs().y * 1.8;
-	m_vecMaxs.m_fZ = m_pEnt->GetCollideable()->OBBMaxs().z * 1.2;
+	m_vecMaxs.m_f[0] = m_pEnt->GetCollideable()->OBBMaxs().x * 1.8;
+	m_vecMaxs.m_f[1] = m_pEnt->GetCollideable()->OBBMaxs().y * 1.8;
+	m_vecMaxs.m_f[2] = m_pEnt->GetCollideable()->OBBMaxs().z * 1.2;
 	return m_vecMaxs;
 }
 
 CVector& CPlayer::getOrigin() {
-	// memcpy(&m_vecOrigin.m_fX, &m_pEnt->GetNetworkable()->GetBaseEntity()->m_vecAbsOrigin.x, 3*sizeof(float));
+	// memcpy(&m_vecOrigin.m_f[0], &m_pEnt->GetNetworkable()->GetBaseEntity()->m_vecAbsOrigin.x, 3*sizeof(float));
 	m_vecOrigin = (CVector&) m_pEnt->GetCollideable()->GetCollisionOrigin();
 	return m_vecOrigin;
 }
 
 CVector& CPlayer::getVelocity() {
-	// memcpy(&m_vecVelocity.m_fX, &m_pEnt->GetNetworkable()->GetBaseEntity()->m_vecAbsVelocity.x, 3*sizeof(float));
+	// memcpy(&m_vecVelocity.m_f[0], &m_pEnt->GetNetworkable()->GetBaseEntity()->m_vecAbsVelocity.x, 3*sizeof(float));
 	static unsigned int iOff = -1;
 	CBaseEntity *pEntity = m_pEnt->GetUnknown()->GetBaseEntity();
 	if( iOff == -1 ) {

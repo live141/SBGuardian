@@ -21,6 +21,7 @@
 
 // #include "CSmmAPI.h"
 //#define NULL 0
+#include <string.h>
 #define GAME_DLL 1
 #include "isaverestore.h"
 #include "ehandle.h"

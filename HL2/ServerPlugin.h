@@ -49,6 +49,11 @@ class CVSPCallback : public IServerPluginCallbacks {
     PLUGIN_RESULT ClientCommand( edict_t *pEntity, const CCommand &args );
     PLUGIN_RESULT NetworkIDValidated( const char *pszUserName, const char *pszNetworkID );
     void OnQueryCvarValueFinished( QueryCvarCookie_t iCookie, edict_t *pPlayerEntity, EQueryCvarValueStatus eStatus, const char *pCvarName, const char *pCvarValue );
+#if SOURCE_ENGINE >= SE_CSGO
+	virtual void ClientFullyConnect(edict_t*);
+	virtual void OnEdictAllocated(edict_t*);
+	virtual void OnEdictFreed(const edict_t*);
+#endif
 };
 
 class CServerPlugin : public IServerPlugin, public ISmmPlugin, public IConCommandBaseAccessor, public IMetamodListener, public IGameEventListener2 {
@@ -128,7 +133,11 @@ public:
     static void ConCommand_Dispatch(const CCommand &command);
     // static void onProcessMove(CBasePlayer *pBasePlayer, CMoveData *pMove);
     static void onTraceAttack(const CTakeDamageInfo& info, const Vector& vecDir, trace_t *pTr);
+#ifdef SOURCE_ENGINE >= SE_CSGO
+	static void onSendUserMessage( IRecipientFilter &filter, int message, const google::protobuf::Message &msg );
+#else
 	static bf_write *onUserMessageBegin( IRecipientFilter *filter, int msg_type );
+#endif
 	static void onMessageEnd( void );
 	static void onEmitSound2( IRecipientFilter& filter, int iEntIndex, int iChannel, const char *pSample,
                 float flVolume, soundlevel_t iSoundlevel, int iFlags = 0, int iPitch = PITCH_NORM,  int iSpecialDSP = 0,

@@ -63,10 +63,13 @@ bool CRecipientFilter::IsInitMessage( void ) const
 	return m_bInitMessage;
 }
 
+#if SOURCE_ENGINE >= SE_CSGO
+#else
 int CRecipientFilter::GetRecipientCount( void ) const
 {
 	return m_Recipients.Size();
 }
+#endif
 
 int	CRecipientFilter::GetRecipientIndex( int slot ) const
 {

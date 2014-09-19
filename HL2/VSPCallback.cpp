@@ -268,3 +268,16 @@ void CVSPCallback::OnQueryCvarValueFinished( QueryCvarCookie_t iCookie, edict_t 
 	}
 }
 
+#if SOURCE_ENGINE >= SE_CSGO
+void CVSPCallback::ClientFullyConnect(edict_t*) {
+
+}
+
+void CVSPCallback::OnEdictAllocated(edict_t*) {
+
+}
+
+void CVSPCallback::OnEdictFreed(const edict_t*) {
+
+}
+#endif
