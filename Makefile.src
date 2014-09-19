@@ -41,13 +41,13 @@ OBJECTS += \
 	modules/AntiWallhack/AntiWallhack.cpp \
 	modules/CvarCheck/CvarCheck.cpp \
 	modules/FOVCheck/FOVCheck.cpp \
-	modules/UpdateSystem/UpdateSystem.cpp \
 	modules/Warmodus/Warmodus.cpp \
 	sourcehook.cpp \
 	sourcehook_impl_chookidman.cpp \
 	sourcehook_impl_chookmaninfo.cpp \
 	sourcehook_impl_cproto.cpp \
-	sourcehook_impl_cvfnptr.cpp
+	sourcehook_impl_cvfnptr.cpp \
+	#modules/UpdateSystem/UpdateSystem.cpp
 
 ifeq "$(DEBUG)" "true"
 	CFLAGS += -g3 -D_DEBUG_
@@ -58,8 +58,7 @@ ifeq "$(PROFILE)" "true"
 	CFLAGS += -D_PROFILE_
 endif
 
-LINK = $(shell $(CC) -print-file-name=libstdc++.a) -m32 -lm -ldl -fPIC -fno-exceptions -fno-rtti -static-libgcc -Wno-non-virtual-dtor -shared \
-	$(HL2LIB)/tier1_i486.a $(LIB_PREFIX)vstdlib$(LIB_SUFFIX) $(LIB_PREFIX)tier0$(LIB_SUFFIX)
+LINK = $(shell $(CC) -print-file-name=libstdc++.a) -m32 -lm -ldl -fPIC -fno-exceptions -static-libgcc -Wno-non-virtual-dtor -shared
 
 ifeq "$(ENGINE)" "original"
 	HL2SDK = $(HL2SDK_ORIG)
@@ -103,7 +102,12 @@ ifeq "$(ENGINE)" "csgo"
 	EXT = csgo
 	HL2LIB = $(HL2SDK)/lib/linux
 	LINK += $(HL2LIB)/interfaces_i486.a
+	LIB_PREFIX = lib
+	LIB_SUFFIX = .so
+	LINK += $(HL2LIB)/mathlib_i486.a
 endif
+
+LINK += $(HL2LIB)/tier1_i486.a $(HL2LIB)/$(LIB_PREFIX)vstdlib$(LIB_SUFFIX) $(HL2LIB)/$(LIB_PREFIX)tier0$(LIB_SUFFIX) #-fno-rtti
 
 BINDIR_MM = hl2_mm_$(EXT)
 BINDIR_STANDALONE = hl2_standalone_$(EXT)
@@ -116,8 +120,8 @@ GCC_VERSION := $(shell $(CC) -dumpversion >&1 | cut -b1)
 CFLAGS += -DPOSIX -Dstricmp=strcasecmp -D_stricmp=strcasecmp -D_strnicmp=strncasecmp \
 	-Dstrnicmp=strncasecmp -D_alloca=alloca \
 	-Dstrcmpi=strcasecmp -DCOMPILER_GCC -D_LINUX -DNDEBUG -D_snprintf=snprintf -D_vsnprintf=vsnprintf \
-        -Wall -Wno-unknown-pragmas -Wno-non-virtual-dtor -fPIC -fno-exceptions -fno-rtti -static-libgcc \
-	$(OPT_FLAGS)
+        -Wall -Wno-unknown-pragmas -Wno-non-virtual-dtor -fPIC -fno-exceptions -static-libgcc -fpermissive \
+	$(OPT_FLAGS) #-fno-rtti
 CFLAGS += -DSE_EPISODEONE=1 -DSE_DARKMESSIAH=2 -DSE_ORANGEBOX=3 -DSE_BLOODYGOODTIME=4 -DSE_EYE=5 \
 	-DSE_CSS=6 -DSE_ORANGEBOXVALVE=7 -DSE_LEFT4DEAD=8 -DSE_LEFT4DEAD2=9 -DSE_ALIENSWARM=10 \
 	-DSE_PORTAL2=11 -DSE_CSGO=12
@@ -136,7 +140,8 @@ INCLUDE += -I. \
 	-I$(HL2PUB)/tier1 \
 	-I$(HL2SDK)/game/shared \
 	-I$(HL2SDK)/game/server \
-	-I$(HL2SDK)/public/game/server
+	-I$(HL2SDK)/public/game/server \
+	-I$(HL2SDK)/common/protobuf-2.5.0/src
 
 ####################################################################################################### 
 OBJ_LINUX := $(OBJECTS:%.cpp=$(BINDIR)/%.o)
